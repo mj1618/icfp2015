@@ -80,7 +80,7 @@ class HexPt:
         norm_se = self.se + self.sw
 
         # hex grid is shunted right every 2 lines
-        x = norm_e+(norm_se)/2
+        x = norm_e+(norm_se)//2
         y = norm_se
 
         return Pt(x, y)
