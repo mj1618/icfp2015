@@ -53,21 +53,21 @@ class Board:
         return ((self.old_seed & RNG_MASK) >> RNG_TRUNC) % len(self.units)
 
     def is_incorrect(self):
-        for pt in self.current_unit.pts:
+        for pt in self.current_unit.get_pts():
             if pt.x>self.width or pt.y>self.height or pt.x<0 or pt.y<0 or self.grid[pt.x][pt.y]==1:
                 return True
         return False
 
-    def move(self, cmd):
-        self.current_unit.move(cmd)
+    def command(self, cmd):
+        self.current_unit.command(cmd)
         if self.is_incorrect():
-            self.current_unit.undo_last_command(cmd)
+            self.current_unit.undo_last_command()
             for pt in self.current_unit.pts:
                 self.grid[pt.x][pt.y] = 1
             self.next_unit()
 
 
-    def render_grid(self):
+    def __str__(self):
         assert len(self.grid) > 0
         assert len(self.grid[0]) > 0
 

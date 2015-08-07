@@ -19,6 +19,11 @@ class Unit:
         self.moves=[]
         self.mask = [pt - pivot for pt in pts]
 
+    def command(self,cmd):
+        if type(cmd) is Move:
+            self.move(cmd.dir)
+        else:
+            self.rotate(cmd.dir)
 
     def move(self, dir):
         self.pivot += dir
@@ -41,7 +46,7 @@ class Unit:
             pts.append( m + self.pivot )
         return pts
 
-    def is_filled(self,x,y):
+    def is_filled(self,y,x):
         for pt in self.get_pts():
             if pt.x==x and pt.y == y:
                 return True
