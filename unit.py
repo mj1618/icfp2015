@@ -31,6 +31,8 @@ class Unit:
 
     def rotate(self, rotate):
         self.mask = [rotate(pt) for pt in self.mask]
+        self.current_rotation = rotate(self.current_rotation)
+
 
     def undo(self,last_command):
         if type(last_command) is Move:

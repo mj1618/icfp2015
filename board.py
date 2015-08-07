@@ -59,7 +59,7 @@ class Board:
             self.record_solution()
 
     def is_complete(self):
-        return False
+        return len(self.units)==0
 
     def record_solution(self):
         solution = []

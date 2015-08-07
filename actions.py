@@ -80,6 +80,10 @@ class NewUnitAction(Action):
         self.unit=None
         self.index = None
     def do(self,board):
+
+        if len(board.units)==0:
+            return
+
         if board.current_unit != None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
@@ -88,7 +92,7 @@ class NewUnitAction(Action):
         self.index = r
         board.current_unit = board.units[r]
         board.units.pop(r)
-        while board.current_unit.top_left_pt().x <  (board.width - board.current_unit.top_right_pt().x):
+        while board.current_unit.top_left_pt().x <  (board.width - board.current_unit.top_right_pt().x - 1):
             board.current_unit.move(E)
     def undo(self,board):
         for pt in board.current_unit.get_pts():
