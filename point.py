@@ -74,4 +74,14 @@ class HexPt:
         return HexPt(self.se, self.sw, -self.e)
 
     def to_pt(self):
-        return sgnmul(self.e, E, W) + sgnmul(self.se, SE, NW) + sgnmul(self.sw, SW, NE)
+        #return sgnmul(self.e, E, W) + sgnmul(self.se, SE, NW) + sgnmul(self.sw, SW, NE)
+        # first, get normalized values for easting and south-eastings
+        norm_e = self.e - self.sw
+        norm_se = self.se + self.sw
+
+        # hex grid is shunted right every 2 lines
+        x = norm_e+(norm_se)//2
+        y = norm_se
+
+        return Pt(x, y)
+
