@@ -3,14 +3,14 @@ import copy
 from point import *
 
 class Unit:
-    def __init__(self, pts, center):
-        self.center = center
+    def __init__(self, pts, pivot):
+        self.pivot = pivot
         self.pts = pts
         self.previous = None
         self.mask = None
         self.moves=[]
         for pt in pts:
-            self.mask.append([pt.__sub__(center)])
+            self.mask.append([pt.__sub__(pivot)])
 
     def pre_move(self):
         self.previous = copy.deepcopy(self)
