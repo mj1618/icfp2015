@@ -18,6 +18,12 @@ class Pt:
 	def __repr__(self):
 		return "(%dX %dY)" % (self.x, self.y)
 
+	def rotate(self, dir):
+		if dir is clockwise:
+			return self.to_hex().clockwise().to_pt()
+		else:
+			return self.to_hex().counterwise().to_pt()
+
 	def to_hex(self):
 		""" Converts to hex coordinates. """
 		if self.y >= 0:
@@ -33,6 +39,9 @@ E = Pt(1, 0)
 SE = Pt(1, 1)
 SW = Pt(0, 1)
 W = Pt(-1, 0)
+
+clockwise = True
+counterwise = False
 
 def sgnmul(n, pos, neg):
 	if n > 0:
