@@ -12,7 +12,7 @@ def main():
     
     test_prob = probs[0]
     test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0])
-
+    print("loaded")
     test_board.step(Move(E))
 
     test_board.step(Move(W))

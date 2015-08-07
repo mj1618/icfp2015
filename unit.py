@@ -27,7 +27,7 @@ class Unit:
             self.rotate(cmd.dir)
 
     def move(self, dir):
-        self.pivot.move(dir)
+        self.pivot = self.pivot.move(dir)
 
     def rotate(self, dir):
         self.mask = [pt.rotate(dir) for pt in self.mask]
