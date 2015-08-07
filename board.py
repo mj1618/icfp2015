@@ -45,6 +45,7 @@ class Board:
         self.current_lines_cleared = 0
         self.old_lines_cleared = 0
         self.score = 0
+        self.error = False
 
         self.step()
 
@@ -53,10 +54,17 @@ class Board:
             self.next_unit_action()
         else:
             self.command(cmd)
-        self.steps.append(Step(self.current_actions))
+        current_step = Step(self.current_actions)
+        self.steps.append(current_step)
         self.current_actions=[]
         if self.is_complete():
             self.record_solution()
+        return current_step
+
+    def undo_last_command(self):
+        self.error=False
+        for action in self.steps.pop().actions:
+            action.undo(self)
 
     def is_complete(self):
         return len(self.units)==0 and self.current_unit is None
@@ -82,20 +90,21 @@ class Board:
     """ returns True if successful, False if an error move occurred. State is left in Error """
     def command(self, cmd):
         self.current_unit.command(cmd)
-        lock = self.is_lock()
-        error = self.current_unit.is_error()
-        if lock:
-            self.current_unit.undo(cmd)
-            score_action = ScoreAction(self.calculate_score())
-            score_action.do(self)
-            self.current_actions.append(score_action)
-            self.next_unit_action()
+        lock = False
+        self.error = self.current_unit.is_error()
+        if not self.error:
+            lock = self.is_lock()
+            if lock:
+                self.current_unit.undo(cmd)
+                score_action = ScoreAction(self.calculate_score())
+                score_action.do(self)
+                self.current_actions.append(score_action)
+                self.next_unit_action()
         self.current_actions.append(CommandAction(cmd,lock))
-        return error
 
     def is_lock(self):
         for pt in self.current_unit.get_pts():
-            if pt.x>self.width or pt.y>self.height or pt.x<0 or pt.y<0 or self.grid[pt.y][pt.x]==1:
+            if pt.x>=self.width or pt.y>=self.height or pt.x<0 or pt.y<0 or self.grid[pt.y][pt.x]==1:
                 return True
         return False
 

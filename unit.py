@@ -7,6 +7,8 @@ class Command:
 class Move(Command):
     def __init__(self, dir):
         self.dir = dir
+    def __repr__(self):
+        return str(self.dir)
 
 class Rotation(Command):
     def __init__(self, rot):
@@ -18,6 +20,7 @@ class Unit:
         self.mask = [pt.delta(pivot) for pt in pts]
         self.old_states = []
         self.current_rotation=NE
+
 
     def command(self,cmd):
         self.old_states.append([copy.deepcopy(self.pivot),self.current_rotation])
@@ -69,8 +72,7 @@ class Unit:
         return False
 
     def row(self,y):
-        return [ pt for pt in self.get_pts() if pt.y==y]
-
+        return [ pt for pt in self.get_pts() if (pt.y == y)]
 
     def top_left_pt(self):
         return min(self.row(0), key=lambda pt: pt.x)

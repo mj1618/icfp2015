@@ -28,6 +28,8 @@ class CommandAction(Action):
     def undo(self,board):
         if not self.lock:
             board.current_unit.undo(self.cmd)
+    def __str__(self):
+        return str(self.cmd)+str(self.lock)
 
 class RowAction(Action):
     def __init__(self,y):
@@ -78,7 +80,7 @@ class RngAction(Action):
 class NewUnitAction(Action):
     def __init__(self):
         self.unit=None
-        self.index = None
+        self.index = 0
     def do(self,board):
 
         if board.current_unit != None:
@@ -95,10 +97,12 @@ class NewUnitAction(Action):
         self.index = r
         board.current_unit = board.units[r]
         board.units.pop(r)
-        while board.current_unit.top_left_pt().x <  (board.width - board.current_unit.top_right_pt().x - 1):
+        while board.current_unit.top_left_pt().x < (board.width - board.current_unit.top_right_pt().x - 1):
             board.current_unit.move(E)
     def undo(self,board):
-        for pt in board.current_unit.get_pts():
-            board.grid[pt.y][pt.x] = 0
+        if board.current_unit is not None:
+            for pt in board.current_unit.get_pts():
+                board.grid[pt.y][pt.x] = 0
         board.current_unit=self.unit
-        board.units.insert(self.index,self.unit)
+        if self.unit is not None:
+            board.units.insert(self.index,self.unit)
