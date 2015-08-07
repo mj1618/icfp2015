@@ -76,16 +76,22 @@ class RngAction(Action):
         # return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
 class NewUnitAction(Action):
-    def __init__(self,unit):
-        self.unit=copy.deepcopy(unit)
+    def __init__(self):
+        self.unit=None
+        self.index = None
     def do(self,board):
         if board.current_unit != None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
-        board.current_unit = board.units[board.rng_action()]
+        r = board.rng_action()
+        self.unit = copy.deepcopy(board.current_unit)
+        self.index = r
+        board.current_unit = board.units[r]
+        board.units.remove(r)
         while board.current_unit.top_left_pt().x <  (board.width - board.current_unit.top_right_pt().x):
             board.current_unit.move(E)
     def undo(self,board):
         for pt in board.current_unit.get_pts():
             board.grid[pt.y][pt.x] = 0
         board.current_unit=self.unit
+        board.units.insert(self.index,self.unit)

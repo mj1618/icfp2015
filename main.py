@@ -15,7 +15,7 @@ def main():
 
     test_board.step(Move(E))
 
-    test_board.step(Move(SE))
+    test_board.step(Move(W))
     # pdb.set_trace()
 
     print(test_board)

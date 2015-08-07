@@ -24,7 +24,6 @@ RENDER_EVENJOIN_RIGHT = u"╦═╝\n"
 RENDER_BOTTOM_LEFT = u"╚═══"
 RENDER_BOTTOM_MID = u"╩═══"
 RENDER_BOTTOM_RIGHT = u"╝\n"
-
 RENDER_GRID_FILL = u"#"
 RENDER_GRID_EMPTY = u" "
 
@@ -68,14 +67,17 @@ class Board:
         self.current_actions.append(a)
         return r
 
+    """ returns True if successful, False if an error move occurred. State is left in Error """
     def command(self, cmd):
         self.current_unit.command(cmd)
         lock = self.is_lock()
+        error = self.current_unit.is_error()
         if lock:
             self.current_unit.undo(cmd)
             self.calculate_score()
             self.next_unit_action()
         self.current_actions.append(CommandAction(cmd,lock))
+        return error
 
     def is_lock(self):
         for pt in self.current_unit.get_pts():
