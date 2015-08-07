@@ -9,13 +9,13 @@ class Move(Command):
         self.dir = dir
 
 class Rotation(Command):
-    def __init__(self, dir):
-        self.dir = dir
+    def __init__(self, rot):
+        self.rot = rot
 
 class Unit:
     def __init__(self, pts, pivot):
         self.pivot = pivot
-        self.mask = [pt - pivot for pt in pts]
+        self.mask = [pt.delta(pivot) for pt in pts]
         self.old_states = []
         self.current_rotation=NE
 
@@ -24,20 +24,21 @@ class Unit:
         if type(cmd) is Move:
             self.move(cmd.dir)
         else:
-            self.rotate(cmd.dir)
+            self.rotate(cmd.rot)
 
     def move(self, dir):
         self.pivot = self.pivot.move(dir)
 
-    def rotate(self, dir):
-        self.mask = [pt.rotate(dir) for pt in self.mask]
-
+    def rotate(self, rotate):
+        self.mask = [rotate(pt) for pt in self.mask]
 
     def undo(self,last_command):
         if type(last_command) is Move:
             self.pivot -= last_command.dir
+        elif last_command.rot is Clockwise:
+            self.mask = [Counterwise(pt) for pt in self.mask]
         else:
-            self.mask = [pt.rotate(not last_command.dir) for pt in self.mask]
+            self.mask = [Clockwise(pt) for pt in self.mask]
         self.old_states.pop()
 
     def is_error(self):
@@ -57,10 +58,7 @@ class Unit:
         return True
 
     def get_pts(self):
-        pts = []
-        for m in self.mask:
-            pts.append( m + self.pivot )
-        return pts
+        return [self.pivot.move(m) for m in self.mask]
 
     def is_filled(self,y,x):
         for pt in self.get_pts():
