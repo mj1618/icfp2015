@@ -15,7 +15,6 @@ class Rotation(Command):
 class Unit:
     def __init__(self, pts, pivot):
         self.pivot = pivot
-        self.mask = None
         self.mask = [pt - pivot for pt in pts]
         self.old_states = []
         self.current_rotation=NE
@@ -28,7 +27,7 @@ class Unit:
             self.rotate(cmd.dir)
 
     def move(self, dir):
-        self.pivot += dir
+        self.pivot.move(dir)
 
     def rotate(self, dir):
         self.mask = [pt.rotate(dir) for pt in self.mask]
@@ -51,7 +50,7 @@ class Unit:
     def rotation_matches(self,rotation):
         unit = copy.deepcopy(self)
         while unit.current_rotation != rotation:
-            unit.rotate(clockwise)
+            unit.rotate(Clockwise)
         for i in range(0,len(unit.mask)):
             if(unit.mask[i] != self.mask[i]):
                 return False
