@@ -55,6 +55,9 @@ class HexPt:
     def __repr__(self):
         return "(%dE %dSE %dSW)" % (self.e, self.se, self.sw)
 
+    def __eq___(self, other):
+        return self.e == other.e and self.se == other.se and self.sw == other.sw
+
     def clockwise(self):
         """Rotates this point clockwise around 0E 0SE 0SW"""
         return HexPt(-self.sw, self.e, self.se)
