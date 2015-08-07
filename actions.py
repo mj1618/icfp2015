@@ -3,6 +3,12 @@ from render import *
 from point import *
 import copy
 
+RNG_MOD = 2**32
+RNG_MULT = 1103515245
+RNG_INC = 12345
+RNG_MASK = 0x7fff0000
+RNG_TRUNC = 16
+
 class Step:
     def __init__(self,actions):
         self.actions=actions
@@ -46,26 +52,39 @@ class ScoreAction(Action):
     def __init__(self,amount):
         self.amount=amount
     def do(self,board):
-        pass
+        board.score+=self.amount
     def undo(self,board):
         board.score-=self.amount
 
 
-class SeedAction(Action):
-    def __init__(self,old_seed,seed):
-        self.seed = seed
-        self.old_seed = old_seed
+class RngAction(Action):
+    def __init__(self,board):
+        self.board = board
+        self.seed = None
+        self.old_seed = None
+
     def do(self,board):
-        pass
+        self.old_seed = board.old_seed
+        self.seed=board.seed
+        board.old_seed = board.seed
+        board.seed = (RNG_MULT*board.seed+RNG_INC % RNG_MOD)
+        return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
+
     def undo(self,board):
         board.seed=self.seed
         board.old_seed=self.seed
+        # return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
 class NewUnitAction(Action):
     def __init__(self,unit):
         self.unit=copy.deepcopy(unit)
     def do(self,board):
-        pass
+        if board.current_unit != None:
+            for pt in board.current_unit.get_pts():
+                board.grid[pt.y][pt.x] = 1
+        board.current_unit = board.units[board.rng_action()]
+        while board.current_unit.top_left_pt().x <  (board.width - board.current_unit.top_right_pt().x):
+            board.current_unit.move(E)
     def undo(self,board):
         for pt in board.current_unit.get_pts():
             board.grid[pt.y][pt.x] = 0

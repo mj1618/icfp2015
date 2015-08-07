@@ -51,26 +51,31 @@ class Board:
 
     def step(self,cmd=None):
         if self.current_unit is None:
-            self.next_unit()
+            self.next_unit_action()
         else:
             self.command(cmd)
         self.steps.append(Step(self.current_actions))
         self.current_actions=[]
 
-    def next_unit(self):
-        self.current_actions.append(NewUnitAction(self.current_unit))
-        if self.current_unit != None:
-            for pt in self.current_unit.get_pts():
-                self.grid[pt.y][pt.x] = 1
-        self.current_unit = self.units[self.rng()]
-        while self.current_unit.top_left_pt().x <  (self.width - self.current_unit.top_right_pt().x):
-            self.current_unit.move(E)
+    def next_unit_action(self):
+        a = NewUnitAction(self.current_unit)
+        a.do(self)
+        self.current_actions.append(a)
 
-    def rng(self):
-        self.old_seed = self.seed
-        self.seed = (RNG_MULT*self.seed+RNG_INC % RNG_MOD)
-        return ((self.old_seed & RNG_MASK) >> RNG_TRUNC) % len(self.units)
+    def rng_action(self):
+        a = RngAction(self.current_unit)
+        r = a.do(self)
+        self.current_actions.append(a)
+        return r
 
+    def command(self, cmd):
+        self.current_unit.command(cmd)
+        lock = self.is_lock()
+        if lock:
+            self.current_unit.undo(cmd)
+            self.calculate_score()
+            self.next_unit_action()
+        self.current_actions.append(CommandAction(cmd,lock))
 
     def is_lock(self):
         for pt in self.current_unit.get_pts():
@@ -85,19 +90,7 @@ class Board:
         else:
             line_bonus=0
         move_score = points+line_bonus
-        self.score+=move_score
-        self.current_actions.append(ScoreAction(move_score))
-
-
-    def command(self, cmd):
-        self.current_unit.command(cmd)
-        if self.is_lock():
-            self.current_actions.append(CommandAction(cmd,True))
-            self.current_unit.undo(cmd)
-            self.calculate_score()
-            self.next_unit()
-        else:
-            self.current_actions.append(CommandAction(cmd,False))
+        return move_score
 
     def __str__(self):
         assert len(self.grid) > 0

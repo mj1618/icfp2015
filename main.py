@@ -13,9 +13,9 @@ def main():
     test_prob = probs[0]
     test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0])
 
-    test_board.command(Move(E))
+    test_board.step(Move(E))
 
-    test_board.command(Move(SE))
+    test_board.step(Move(SE))
     # pdb.set_trace()
 
     print(test_board)
