@@ -82,6 +82,7 @@ class NewUnitAction(Action):
     def do(self,board):
 
         if len(board.units)==0:
+            board.current_unit = None
             return
 
         if board.current_unit != None:
