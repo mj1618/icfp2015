@@ -127,3 +127,26 @@ class Board:
         return output
 
 
+    def get_hole_count(self):
+        count = 0
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.grid[y][x] == 1:
+                    continue
+                l = 1 if (x == 0) else self.grid[y][x-1]
+                r = 1 if (x == self.width-1) else self.grid[y][x+1]
+                tl = 1 if (y == 0) else (1 if ((x==0) and (y-1)%2) else self.grid[y-1][x-((y-1)%2)])
+                tr = 1 if (y == 0) else  (1 if ((x==self.width-1) and (y%2)) else self.grid[y-1][x+(y%2)])
+                bl = 1 if (y == self.height-1) else (1 if ((x==0) and (y-1)%2) else self.grid[y+1][x-((y+1)%2)])
+                br = 1 if (y == self.height-1) else (1 if ((x==self.width-1) and y%2) else self.grid[y+1][x+(y%2)])
+                
+                hole = False
+                hole |= (l and r) or (tl and br) or (bl and tr)
+                hole |= (l and tr and br) or (r and tl and bl)
+                
+                count += hole
+                #if hole:
+                #    print("{},{},{},{},{},{} = {}".format(l, tl, tr, r, br, bl, hole))
+                #    print('{},{}'.format(x,y))
+        return count
+ 
