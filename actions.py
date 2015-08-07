@@ -81,13 +81,15 @@ class NewUnitAction(Action):
         self.index = None
     def do(self,board):
 
+        if board.current_unit != None:
+            for pt in board.current_unit.get_pts():
+                board.grid[pt.y][pt.x] = 1
+
+
         if len(board.units)==0:
             board.current_unit = None
             return
 
-        if board.current_unit != None:
-            for pt in board.current_unit.get_pts():
-                board.grid[pt.y][pt.x] = 1
         r = board.rng_action()
         self.unit = copy.deepcopy(board.current_unit)
         self.index = r

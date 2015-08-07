@@ -86,7 +86,9 @@ class Board:
         error = self.current_unit.is_error()
         if lock:
             self.current_unit.undo(cmd)
-            self.calculate_score()
+            score_action = ScoreAction(self.calculate_score())
+            score_action.do(self)
+            self.current_actions.append(score_action)
             self.next_unit_action()
         self.current_actions.append(CommandAction(cmd,lock))
         return error
@@ -98,7 +100,7 @@ class Board:
         return False
 
     def calculate_score(self):
-        points = len(self.current_unit.mask) + 100*(1+self.current_lines_cleared)/2
+        points = len(self.current_unit.mask) + 100*(1+self.current_lines_cleared)*self.current_lines_cleared/2
         if self.old_lines_cleared > 1:
             line_bonus = (self.old_lines_cleared-1)*points/10
         else:
@@ -123,7 +125,7 @@ class Board:
             if row_index % 2:
                 output += RENDER_BODY_OFFSET
             for i in range(width):
-                output += RENDER_BODY_LEFTMID.format(RENDER_GRID_FILL if self.grid[row_index][i] or self.current_unit.is_filled(row_index,i) else RENDER_GRID_EMPTY)
+                output += RENDER_BODY_LEFTMID.format(RENDER_GRID_FILL if self.grid[row_index][i] or (self.current_unit is not None and self.current_unit.is_filled(row_index,i)) else RENDER_GRID_EMPTY)
             output += RENDER_BODY_RIGHT
 
             if row_index != height-1:

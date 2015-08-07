@@ -16,10 +16,13 @@ def main():
     print("loaded")
 
     while not test_board.is_complete():
+    # for i in range(0,8):
         test_board.step(Move(SE))
     # test_board.step(Move(SE))
     # test_board.step(Rotation(Clockwise))
     # pdb.set_trace()
+
+    print("%d"%test_board.score)
 
     print(test_board)
 
