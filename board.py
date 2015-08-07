@@ -55,6 +55,18 @@ class Board:
             self.command(cmd)
         self.steps.append(Step(self.current_actions))
         self.current_actions=[]
+        if self.is_complete():
+            self.record_solution()
+
+    def is_complete(self):
+        return False
+
+    def record_solution(self):
+        solution = []
+        for step in self.steps:
+            for action in step.actions:
+                if type(action) is CommandAction:
+                    solution.append(action.cmd)
 
     def next_unit_action(self):
         a = NewUnitAction()

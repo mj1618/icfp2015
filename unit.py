@@ -51,8 +51,8 @@ class Unit:
         unit = copy.deepcopy(self)
         while unit.current_rotation != rotation:
             unit.rotate(Clockwise)
-        for i in range(0,len(unit.mask)):
-            if(unit.mask[i] != self.mask[i]):
+        for m in self.mask:
+            if m not in unit.mask:
                 return False
         return True
 
