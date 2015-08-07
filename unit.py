@@ -36,7 +36,7 @@ class Unit:
 
     def undo(self,last_command):
         if type(last_command) is Move:
-            self.pivot -= last_command.dir
+            self.pivot = self.pivot.move(-last_command.dir)
         elif last_command.rot is Clockwise:
             self.mask = [Counterwise(pt) for pt in self.mask]
         else:

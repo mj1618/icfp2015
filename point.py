@@ -52,6 +52,9 @@ class HexPt:
     def __sub__(self, other):
         return HexPt(self.e - other.e, self.se - other.se, self.sw - other.sw)
 
+    def __neg__(self):
+        return HexPt(-self.e, -self.se, -self.sw)
+
     def __repr__(self):
         return "(%dE %dSE %dSW)" % (self.e, self.se, self.sw)
 
@@ -65,17 +68,6 @@ class HexPt:
     def counterwise(self):
         """Rotates this point counter-clockwise around 0E 0SE 0SW"""
         return HexPt(self.se, self.sw, -self.e)
-
-    def to_pt(self):
-        # first, get normalized values for easting and south-eastings
-        norm_e = self.e - self.sw
-        norm_se = self.se + self.sw
-
-        # hex grid is shunted right every 2 lines
-        x = norm_e+(norm_se)//2
-        y = norm_se
-
-        return Pt(x, y)
 
 NW = HexPt(0, -1, 0)
 NE = HexPt(0, 0, -1)
