@@ -44,8 +44,8 @@ class Board:
 
     def next_unit(self):
         self.current_unit = self.units[self.rng()]
-        while self.current_unit.top_left_pt() <  (self.width - self.current_unit.top_right_pt()):
-            self.current_unit.move_right()
+        while self.current_unit.top_left_pt().x <  (self.width - self.current_unit.top_right_pt().x):
+            self.current_unit.move(E)
 
     def rng(self):
         self.old_seed = self.seed
@@ -61,7 +61,7 @@ class Board:
     def move(self, cmd):
         self.current_unit.move(cmd)
         if self.is_incorrect():
-            self.current_unit.move_opposite(cmd)
+            self.current_unit.undo_last_command(cmd)
             for pt in self.current_unit.pts:
                 self.grid[pt.x][pt.y] = 1
             self.next_unit()
