@@ -33,12 +33,12 @@ class Unit:
         self.mask = [pt.rotate(dir) for pt in self.mask]
         self.moves.append(Rotation(dir))
 
-    def undo_last_command(self):
-        last_command = self.moves.pop()
+    def undo(self,last_command):
         if type(last_command) is Move:
             self.pivot -= last_command.dir
         else:
             self.mask = [pt.rotate(not last_command.dir) for pt in self.mask]
+
 
     def get_pts(self):
         pts = []

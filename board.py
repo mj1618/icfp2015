@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from render import *
 from point import *
+import copy
+from actions import *
 RNG_MOD = 2**32
 RNG_MULT = 1103515245
 RNG_INC = 12345
@@ -37,12 +39,29 @@ class Board:
         self.height = height
         self.units = units
         self.seed = seed
+        self.steps = []
+        self.current_actions=[]
         self.old_seed = None
         self.current_unit = None
+        self.current_lines_cleared = 0
+        self.old_lines_cleared = 0
+        self.score = 0
 
-        self.next_unit()
+        self.step()
+
+    def step(self,cmd=None):
+        if self.current_unit is None:
+            self.next_unit()
+        else:
+            self.command(cmd)
+        self.steps.append(Step(self.current_actions))
+        self.current_actions=[]
 
     def next_unit(self):
+        self.current_actions.append(NewUnitAction(self.current_unit))
+        if self.current_unit != None:
+            for pt in self.current_unit.get_pts():
+                self.grid[pt.y][pt.x] = 1
         self.current_unit = self.units[self.rng()]
         while self.current_unit.top_left_pt().x <  (self.width - self.current_unit.top_right_pt().x):
             self.current_unit.move(E)
@@ -52,20 +71,33 @@ class Board:
         self.seed = (RNG_MULT*self.seed+RNG_INC % RNG_MOD)
         return ((self.old_seed & RNG_MASK) >> RNG_TRUNC) % len(self.units)
 
-    def is_incorrect(self):
+
+    def is_lock(self):
         for pt in self.current_unit.get_pts():
-            if pt.x>self.width or pt.y>self.height or pt.x<0 or pt.y<0 or self.grid[pt.x][pt.y]==1:
+            if pt.x>self.width or pt.y>self.height or pt.x<0 or pt.y<0 or self.grid[pt.y][pt.x]==1:
                 return True
         return False
 
+    def calculate_score(self):
+        points = len(self.current_unit.mask) + 100*(1+self.current_lines_cleared)/2
+        if self.old_lines_cleared > 1:
+            line_bonus = (self.old_lines_cleared-1)*points/10
+        else:
+            line_bonus=0
+        move_score = points+line_bonus
+        self.score+=move_score
+        self.current_actions.append(ScoreAction(move_score))
+
+
     def command(self, cmd):
         self.current_unit.command(cmd)
-        if self.is_incorrect():
-            self.current_unit.undo_last_command()
-            for pt in self.current_unit.pts:
-                self.grid[pt.x][pt.y] = 1
+        if self.is_lock():
+            self.current_actions.append(CommandAction(cmd,True))
+            self.current_unit.undo(cmd)
+            self.calculate_score()
             self.next_unit()
-
+        else:
+            self.current_actions.append(CommandAction(cmd,False))
 
     def __str__(self):
         assert len(self.grid) > 0
