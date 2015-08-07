@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-__import__('render.py')
-__import__('point')
-
+from render import *
+from point import *
 RNG_MOD = 2**32
 RNG_MULT = 1103515245
 RNG_INC = 12345
@@ -35,5 +34,16 @@ class Board:
         self.seed = (RNG_MULT*self.seed+RNG_INC % RNG_MOD)
         return (self.old_seed & RNG_MASK) >> RNG_TRUNC
 
+    def is_incorrect(self):
+        for pt in self.current_unit.pts:
+            if pt.x>self.width or pt.y>self.height or pt.x<0 or pt.y<0 or self.board[pt.x][pt.y]==1:
+                return True
+        return False
 
     def move(self, cmd):
+        self.current_unit.move(cmd)
+        if self.is_incorrect():
+            # do stuff
+
+
+

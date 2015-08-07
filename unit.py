@@ -1,34 +1,33 @@
 #!/usr/bin/env python
-
-__import__('point.py')
+import copy
+from point import *
 
 class Unit:
-
-    RIGHT = [1,0]
-    LEFT = [-1,0]
-    UP = [0,-1]
-    DOWN = [0,1]
-
     def __init__(self, pts, center):
         self.center = center
         self.pts = pts
+        self.previous = None
         self.mask = None
+        self.moves=[]
         for pt in pts:
             self.mask.append([pt.__sub__(center)])
 
+    def pre_move(self):
+        self.previous = copy.deepcopy(self)
 
-    def move_right(self):
+    def move_w(self):
+        self.pre_move()
         for pt in self.pts:
-            pt.__add__(self, Unit.RIGHT)
+            pt += Pt.E
 
-    def move_left(self):
+    def move_e(self):
+        self.pre_move()
         for pt in self.pts:
-            pt.__add__(self, Unit.LEFT)
+            pt += Pt.W
 
-    def move_up(self):
-        for pt in self.pts:
-            pt.__add__(self, Unit.UP)
-
-    def move_down(self):
-        for pt in self.pts:
-            pt.__add__(self, Unit.DOWN)
+    def move(self,cmd):
+        if cmd==E:
+            self.move_e()
+        elif cmd==W:
+            self.move_w()
+        self.moves.append(cmd)
