@@ -29,22 +29,14 @@ class Pt:
         return Pt(x, y)
 
     def delta(self, pivot):
-        bias = pivot.y % 2
         dx = pivot.x - self.x
         dy = pivot.y - self.y
         if dy >= 0:
             se = dy if abs(dx) > abs(dy) else dx
             return HexPt(dx - se, se, dy - se)
-        return HexPt(0,0,0)
-
-#-    def to_hex(self):
-#-        """ Converts to hex coordinates. """
-#-        if self.y >= 0:
-#-            se = self.y if abs(self.x) > abs(self.y) else self.x
-#-            return HexPt(self.x - se, se, self.y - se)
-#-        else:
-#-            ne = self.y if abs(self.x) > abs(self.y) else self.x
-#-            return HexPt(self.x - ne, self.y + ne, -ne)
+        else:
+            ne = dy if abs(dx) > abs(dy) else dx
+            return HexPt(dx - ne, dy + ne, -ne)
 
 
 class HexPt:
