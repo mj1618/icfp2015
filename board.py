@@ -37,10 +37,10 @@ class Board:
         self.width = width
         self.height = height
         self.units = units
+        self.old_seed = 0
         self.seed = seed
         self.steps = []
         self.current_actions=[]
-        self.old_seed = None
         self.current_unit = None
         self.current_lines_cleared = 0
         self.old_lines_cleared = 0
@@ -57,7 +57,7 @@ class Board:
         self.current_actions=[]
 
     def next_unit_action(self):
-        a = NewUnitAction(self.current_unit)
+        a = NewUnitAction()
         a.do(self)
         self.current_actions.append(a)
 

@@ -87,7 +87,7 @@ class NewUnitAction(Action):
         self.unit = copy.deepcopy(board.current_unit)
         self.index = r
         board.current_unit = board.units[r]
-        board.units.remove(r)
+        board.units.pop(r)
         while board.current_unit.top_left_pt().x <  (board.width - board.current_unit.top_right_pt().x):
             board.current_unit.move(E)
     def undo(self,board):
