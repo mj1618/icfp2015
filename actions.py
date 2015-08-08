@@ -117,6 +117,8 @@ class Power(Action):
                 board.score -= 300
             board.word_count[self.word] = count - 1
 
+    def __repr__(self):
+        return "PowerAction(%s)" % self.word
 
 class NewUnitAction(Action):
     def __init__(self):
