@@ -9,23 +9,9 @@ RNG_INC = 12345
 RNG_MASK = 0x7fff0000
 RNG_TRUNC = 16
 
-RENDER_TOP_LEFT = u"╔═══"
-RENDER_TOP_MID = u"╦═══"
-RENDER_TOP_RIGHT = u"╗\n"
-RENDER_BODY_LEFTMID = u"║ {} "
-RENDER_BODY_RIGHT = u"║\n"
-RENDER_BODY_OFFSET = u"  "
-RENDER_ODDJOIN_LEFT = u"╚═╦═"
-RENDER_ODDJOIN_MID = u"╩═╦═"
-RENDER_ODDJOIN_RIGHT = u"╩═╗\n"
-RENDER_EVENJOIN_LEFT = u"╔═╩═"
-RENDER_EVENJOIN_MID = u"╦═╩═"
-RENDER_EVENJOIN_RIGHT = u"╦═╝\n"
-RENDER_BOTTOM_LEFT = u"╚═══"
-RENDER_BOTTOM_MID = u"╩═══"
-RENDER_BOTTOM_RIGHT = u"╝\n"
-RENDER_GRID_FILL = u"#"
-RENDER_GRID_EMPTY = u" "
+BOARD_FILL = u"#"
+BOARD_UNIT = u"U"
+BOARD_EMPTY = u" "
 
 
 class Board:
@@ -33,9 +19,13 @@ class Board:
     solutions = None
 
     def __init__(self, width, height, grid, units, seed):
-        self.grid = grid
+        assert height == len(grid)
+        for row in grid:
+            assert len(row) == width
+
         self.width = width
         self.height = height
+        self.grid = grid
         self.units = units
         self.old_seed = 0
         self.seed = seed
@@ -117,39 +107,18 @@ class Board:
         move_score = points+line_bonus
         return move_score
 
+    def query_cell(self, y, x):
+        assert (y >= 0) and (y < self.height)
+        assert (x >= 0) and (x < self.width)
+        if self.grid[y][x]:
+            return BOARD_FILL
+        elif (self.current_unit is not None and self.current_unit.is_filled(y,x)):
+            return BOARD_UNIT
+        return BOARD_EMPTY
+
+
     def __str__(self):
-        assert len(self.grid) > 0
-        assert len(self.grid[0]) > 0
-
-        height = len(self.grid)
-        width = len(self.grid[0])
-        for row in self.grid:
-            assert len(row) == width
-
-        output = RENDER_TOP_LEFT + RENDER_TOP_MID*(width-1) + RENDER_TOP_RIGHT
-
-        row_index = 0
-        while row_index < height:
-
-            if row_index % 2:
-                output += RENDER_BODY_OFFSET
-            for i in range(width):
-                output += RENDER_BODY_LEFTMID.format(RENDER_GRID_FILL if self.grid[row_index][i] or (self.current_unit is not None and self.current_unit.is_filled(row_index,i)) else RENDER_GRID_EMPTY)
-            output += RENDER_BODY_RIGHT
-
-            if row_index != height-1:
-                if row_index % 2:
-                    output += RENDER_EVENJOIN_LEFT + RENDER_EVENJOIN_MID*(width-1) + RENDER_EVENJOIN_RIGHT
-                else:
-                    output += RENDER_ODDJOIN_LEFT + RENDER_ODDJOIN_MID*(width-1) + RENDER_ODDJOIN_RIGHT
-
-            row_index += 1
-
-        if (height-1) % 2:
-            output += RENDER_BODY_OFFSET
-        output += RENDER_BOTTOM_LEFT + RENDER_BOTTOM_MID*(width-1) + RENDER_BOTTOM_RIGHT
-
-        return output
+        return render_grid(self.width, self.height, self.query_cell)
 
 
     def get_hole_count(self):

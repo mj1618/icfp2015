@@ -19,15 +19,7 @@ RENDER_BOTTOM_RIGHT = u"╝\n"
 RENDER_GRID_FILL = u"#"
 RENDER_GRID_EMPTY = u" "
 
-def render_grid(grid):
-    assert len(grid) > 0
-    assert len(grid[0]) > 0
-
-    height = len(grid)
-    width = len(grid[0])
-    for row in grid:
-        assert len(row) == width
-
+def render_grid(width, height, query_func):
     output = RENDER_TOP_LEFT + RENDER_TOP_MID*(width-1) + RENDER_TOP_RIGHT
 
     row_index = 0
@@ -36,7 +28,7 @@ def render_grid(grid):
         if row_index % 2:
             output += RENDER_BODY_OFFSET
         for i in range(width):
-            output += RENDER_BODY_LEFTMID.format(RENDER_GRID_FILL if grid[row_index][i] else RENDER_GRID_EMPTY)
+            output += RENDER_BODY_LEFTMID.format(query_func(row_index, i))
         output += RENDER_BODY_RIGHT
 
         if row_index != height-1:
