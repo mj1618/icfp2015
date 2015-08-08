@@ -148,26 +148,90 @@ class Board:
         return render_grid(self.width, self.height, self.query_cell)
 
 
+    def get_base_heightmap(self):
+        heightmap = [0 for i in range(self.width)]
+        
+        column = 0
+        row = 0
+
+        _is_valid = lambda p: (p.x >=0) and (p.y >=0) and (p.x < self.width) and (p.y < self.height)
+
+        def _follow(p):
+            ne = p.move(NE)
+            
+            if _is_valid(ne) and self.grid[ne.y][ne.x] == 1:
+                result = _follow(ne)
+                if result != -1:
+                    heightmap[ne.x] = max(heightmap[ne.x], ne.y)
+                return result
+            
+            if p.x ==self.width-1:
+                return p.x
+
+            e = p.move(E)
+            if (e.y == self.height) or (_is_valid(e) and self.grid[e.y][e.x]) == 1:
+                result = _follow(e)
+                if result != -1:
+                    heightmap[e.x] = max(heightmap[e.x], e.y)
+                return result
+                    
+            se = p.move(SE)
+            if _is_valid(se) and self.grid[se.y][se.x] == 1:
+                result = _follow(se)
+                if result != -1:
+                    heightmap[se.x] = max(heightmap[se.x], se.y)
+                return result
+
+            # skip backtracking for now
+            # for now, return how far we got.
+            return p.x
+            
+
+        while (column < self.width):
+            for row in range(self.height):
+                if self.grid[row][column] == 1:
+                    result = _follow(Pt(column, row))
+                    if result != -1:
+                        heightmap[column] = max(heightmap[column], row)
+                        column = result
+                        break
+                elif row == self.height-1:
+                    result = _follow(Pt(column, row+1))
+                    if result != -1:
+                        heightmap[column] = max(heightmap[column], row+1)
+                        column = result
+                        break
+            column += 1
+
+        return heightmap
+
+
+
+    def is_hole(self, point):
+        if self.grid[y][x] == 1:
+            return 0
+
+        x, y = point.x, point.y
+        l = 1 if (x == 0) else self.grid[y][x-1]
+        r = 1 if (x == self.width-1) else self.grid[y][x+1]
+        tl = 1 if (y == 0) else (1 if ((x==0) and (y-1)%2) else self.grid[y-1][x-((y-1)%2)])
+        tr = 1 if (y == 0) else  (1 if ((x==self.width-1) and (y%2)) else self.grid[y-1][x+(y%2)])
+        bl = 1 if (y == self.height-1) else (1 if ((x==0) and (y-1)%2) else self.grid[y+1][x-((y+1)%2)])
+        br = 1 if (y == self.height-1) else (1 if ((x==self.width-1) and y%2) else self.grid[y+1][x+(y%2)])
+        
+        hole = 0
+        hole |= (l and r) or (tl and br) or (bl and tr)
+        hole |= (l and tr and br) or (r and tl and bl)
+        #if hole:
+        #    print("{},{},{},{},{},{} = {}".format(l, tl, tr, r, br, bl, hole))
+        #    print('{},{}'.format(x,y))
+
+        return hole
+
     def get_hole_count(self):
         count = 0
         for y in range(self.height):
             for x in range(self.width):
-                if self.grid[y][x] == 1:
-                    continue
-                l = 1 if (x == 0) else self.grid[y][x-1]
-                r = 1 if (x == self.width-1) else self.grid[y][x+1]
-                tl = 1 if (y == 0) else (1 if ((x==0) and (y-1)%2) else self.grid[y-1][x-((y-1)%2)])
-                tr = 1 if (y == 0) else  (1 if ((x==self.width-1) and (y%2)) else self.grid[y-1][x+(y%2)])
-                bl = 1 if (y == self.height-1) else (1 if ((x==0) and (y-1)%2) else self.grid[y+1][x-((y+1)%2)])
-                br = 1 if (y == self.height-1) else (1 if ((x==self.width-1) and y%2) else self.grid[y+1][x+(y%2)])
-                
-                hole = False
-                hole |= (l and r) or (tl and br) or (bl and tr)
-                hole |= (l and tr and br) or (r and tl and bl)
-                
-                count += hole
-                #if hole:
-                #    print("{},{},{},{},{},{} = {}".format(l, tl, tr, r, br, bl, hole))
-                #    print('{},{}'.format(x,y))
+                count += self.is_hole(Pt(x,y))
         return count
  
