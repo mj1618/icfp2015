@@ -122,12 +122,12 @@ class Power(Action):
 
 """Only used for testing to put units in different places"""
 class SetUnitAction(Action):
-    def __init__(self):
-        self.unit=None
+    def __init__(self,unit):
+        self.unit=unit
 
-    def do(self,board,unit):
-        board.current_unit = unit
-        for p in unit.get_pts():
+    def do(self,board):
+        board.current_unit = self.unit
+        for p in self.unit.get_pts():
             if board.grid[p.y][p.x] == 1:
                 board.is_full = True
                 break
