@@ -81,20 +81,24 @@ class Power(Action):
     def __init__(self,word,cmds):
         self.cmds=cmds
         self.word=word
+        self.completed = False
     def do(self,board):
         for cmd in self.cmds:
             board.step(cmd)
-            if board.error:
+            if board.error or board.is_lock():
                 for i in range(0,self.cmds.index(cmd)):
                     board.undo_last_step()
                 return False
         board.score+=2*len(self.cmds)
+        self.completed=True
         return True
 
     def undo(self,board):
-        for cmd in self.cmds:
-            board.undo_last_step()
-        board.score-=2*len(self.cmds)
+        if self.completed:
+            for cmd in self.cmds:
+                board.undo_last_step()
+            board.score-=2*len(self.cmds)
+
 
 class NewUnitAction(Action):
     def __init__(self):

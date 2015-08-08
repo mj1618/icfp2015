@@ -53,6 +53,18 @@ class Board:
         if self.is_complete():
             self.record_solution()
         return current_step
+    def action_step(self,action):
+        if self.current_unit is None:
+            self.next_unit_action()
+        else:
+            action.do(self)
+            self.current_actions.append(action)
+        current_step = Step(self.current_actions)
+        self.steps.append(current_step)
+        self.current_actions=[]
+        if self.is_complete():
+            self.record_solution()
+        return current_step
 
     def undo_last_step(self):
         self.error=False
@@ -97,9 +109,11 @@ class Board:
         self.current_actions.append(CommandAction(cmd,lock))
 
     def is_lock(self):
-        for pt in self.current_unit.get_pts():
-            if pt.x>=self.width or pt.y>=self.height or pt.x<0 or pt.y<0 or self.grid[pt.y][pt.x]==1:
-                return True
+        if self.current_unit is not None:
+            for pt in self.current_unit.get_pts():
+                if pt.x>=self.width or pt.y>=self.height or pt.x<0 or pt.y<0 or self.grid[pt.y][pt.x]==1:
+                    return True
+        else: return True
         return False
 
     def calculate_score(self):
