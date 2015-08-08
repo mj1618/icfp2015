@@ -52,7 +52,7 @@ def loader(input_data):
             assert is_valid_point(member_p)
             members.append(member_p)
         
-        unit = Unit(members, pivot_p)
+        unit = Unit(members, pivot_p, data["width"])
         data["units"].append(unit)
 
 
