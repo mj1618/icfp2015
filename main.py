@@ -15,6 +15,8 @@ from placer_algorithm import *
 # import pdb
 import sys
 import codecs
+from path_finder import *
+
 def replay_test():
     prob = loader.get_qualifier_problems(6)[0]
     board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=0, sources_length=prob["sourceLength"])
@@ -28,6 +30,12 @@ def placer_test():
     alg = PlacerAlgorithm(board)
     alg.start()
 
+def path_finder_test():
+    prob = loader.get_qualifier_problems(2)[0]
+    board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=1, sources_length=prob["sourceLength"])
+    board.install_step_hook(step_hook=animate(5/10))
+    pf = PathFinder(board,Unit([Pt(0,0)],Pt(0,0),board.width,False),Unit([Pt(10,10)],Pt(10,10),board.width,False))
+    pf.find_path()
 
 def display(board, is_undo, cmd):
     print("%s: %s" % ("UNDO" if is_undo else "DO", str(cmd)))
@@ -89,6 +97,8 @@ def main(args):
     algo = BasicAlgorithm(test_board, step_hook=hook)
     algo.start()
 
+    exit()
+
     print("%d"%test_board.score)
     print(test_board)
     print(test_board.solutions[0])
@@ -118,6 +128,7 @@ group = opts.add_mutually_exclusive_group()
 group.add_argument("-v", help="display board state at each step", action="store_true")
 group.add_argument("-a", help="animate board state (specify again for slower frames)", action="count")
 group.add_argument("-r", help="run replay test", action="store_true")
+group.add_argument("-pf", help="run path finder test", action="store_true")
 opts.add_argument("-p", type=int, help="select a qualifying problem", default=1)
 opts.add_argument("-s", help="submit solution to the specified problem", action="count")
 
@@ -126,5 +137,7 @@ if __name__ == "__main__":
     args = opts.parse_args()
     if args.r:
         replay_test()
+    if args.pf:
+        path_finder_test()
     else:
         main(args)

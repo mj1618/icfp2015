@@ -2,6 +2,7 @@
 from render import *
 from point import *
 import copy
+from actions import *
 
 RNG_MOD = 2**32
 RNG_MULT = 1103515245
@@ -17,6 +18,10 @@ class Step:
             a.undo(board)
     def __str__(self):
         return [ str(a) for a in self.actions]
+    def command(self):
+        for action in self.actions:
+            if type(action) is CommandAction:
+                return action.cmd
 
 class Action:
     pass
