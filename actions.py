@@ -82,12 +82,20 @@ class Power(Action):
         self.cmds=cmds
         self.word=word
         self.completed = False
+        self.steps=[]
+
+    def undo_last_step(self,board,step):
+        board.error=False
+        board.is_full = False
+        for action in step.actions:
+            action.undo(board)
     def do(self,board):
         for cmd in self.cmds:
             board.step(cmd)
-            if board.error or board.is_lock():
-                for i in range(0,self.cmds.index(cmd)):
-                    board.undo_last_step()
+            self.steps.append(board.steps.pop())
+            if board.error or (board.is_lock() and self.cmds.index(cmd) < len(self.cmds)-1):
+                for step in reversed(self.steps):
+                    self.undo_last_step(board,step)
                 return False
         board.score+=2*len(self.cmds)
         self.completed=True
@@ -106,6 +114,9 @@ class NewUnitAction(Action):
         self.index = 0
     def do(self,board):
 
+        self.unit = board.current_unit
+
+
         if board.current_unit != None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
@@ -116,8 +127,8 @@ class NewUnitAction(Action):
             return
 
         r = board.rng_action()
-        self.unit = copy.deepcopy(board.current_unit)
         self.index = r
+
         board.current_unit = board.units[r]
         board.units.pop(r)
 

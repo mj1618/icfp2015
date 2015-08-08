@@ -58,6 +58,8 @@ class Board:
             self.next_unit_action()
         else:
             action.do(self)
+            if not action.completed:
+                return
             self.current_actions.append(action)
         current_step = Step(self.current_actions)
         self.steps.append(current_step)

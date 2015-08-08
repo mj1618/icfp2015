@@ -4,6 +4,9 @@ class Pt:
         self.x = x
         self.y = y
 
+    def copy(self):
+        return Pt(self.x,self.y)
+
     def __add__(self, other):
         return Pt(self.x + other.x, self.y + other.y)
 

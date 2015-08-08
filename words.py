@@ -17,8 +17,6 @@ for key, val in chars.items():
 
 class PowerWords:
 
-
-
     def __init__(self):
         words = ["Ei!","Ia! Ia!","R'lyeh","Yuggoth","cthulhu"]
         self.words = [ w.lower() for w in words]
