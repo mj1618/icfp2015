@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import random
+from words import *
 from render import *
 from point import *
 import copy
@@ -29,22 +31,24 @@ class BasicAlgorithm:
         # elif r==3:
         #     cmd=Move(W)
 
-        cmd = None
-        if self.i%3==0:
-            cmd = Move(E)
-        elif self.i%3==1:
-            cmd = Move(SW)
-        elif self.i%3==2:
-            cmd = Move(W)
-
-
-        if self.board.current_unit is not None:
-            self.last_pos = self.board.current_unit.pivot
-        step = self.board.step(cmd)
-
-        # if self.board.is_complete() and self.last_pos.y < self.board.height/2:
-        #     self.board.undo_last_command()
-        if self.board.is_complete():
-            return
-        elif self.board.error:
-            self.board.undo_last_command()
+        pws = PowerWords()
+        success = False
+        for w in pws.words:
+            step = self.board.action_step(Power(w,pws.decode(w)))
+            if self.board.is_complete():
+                return
+            elif self.board.error:
+                self.board.undo_last_step()
+            else:
+                success=True
+                break
+        if not success:
+            for cmd in random.shuffle([Move(E),Move(SE),Move(SW),Move(W)]):
+                step = self.board.step(cmd)
+                if self.board.is_complete():
+                    return
+                elif self.board.error:
+                    self.board.undo_last_step()
+                else:
+                    success=True
+                    break

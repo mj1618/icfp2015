@@ -11,6 +11,8 @@ RNG_TRUNC = 16
 
 BOARD_FILL = u"#"
 BOARD_UNIT = u"U"
+BOARD_PIVOT = u"¨"
+BOARD_UNIT_PIVOT = u"Ü"
 BOARD_EMPTY = u" "
 
 
@@ -36,6 +38,7 @@ class Board:
         self.old_lines_cleared = 0
         self.score = 0
         self.error = False
+        self.is_full = False
 
         self.step()
 
@@ -50,14 +53,27 @@ class Board:
         if self.is_complete():
             self.record_solution()
         return current_step
+    def action_step(self,action):
+        if self.current_unit is None:
+            self.next_unit_action()
+        else:
+            action.do(self)
+            self.current_actions.append(action)
+        current_step = Step(self.current_actions)
+        self.steps.append(current_step)
+        self.current_actions=[]
+        if self.is_complete():
+            self.record_solution()
+        return current_step
 
-    def undo_last_command(self):
+    def undo_last_step(self):
         self.error=False
+        self.is_full = False
         for action in self.steps.pop().actions:
             action.undo(self)
 
     def is_complete(self):
-        return len(self.units)==0 and self.current_unit is None
+        return ( len(self.units)==0 and self.current_unit is None ) or self.is_full
 
     def record_solution(self):
         solution = []
@@ -93,9 +109,11 @@ class Board:
         self.current_actions.append(CommandAction(cmd,lock))
 
     def is_lock(self):
-        for pt in self.current_unit.get_pts():
-            if pt.x>=self.width or pt.y>=self.height or pt.x<0 or pt.y<0 or self.grid[pt.y][pt.x]==1:
-                return True
+        if self.current_unit is not None:
+            for pt in self.current_unit.get_pts():
+                if pt.x>=self.width or pt.y>=self.height or pt.x<0 or pt.y<0 or self.grid[pt.y][pt.x]==1:
+                    return True
+        else: return True
         return False
 
     def calculate_score(self):
@@ -112,8 +130,15 @@ class Board:
         assert (x >= 0) and (x < self.width)
         if self.grid[y][x]:
             return BOARD_FILL
-        elif (self.current_unit is not None and self.current_unit.is_filled(y,x)):
-            return BOARD_UNIT
+        elif self.current_unit is not None:
+            fill = self.current_unit.is_filled(y, x)
+            pivot = self.current_unit.pivot == Pt(x, y)
+            if fill and pivot:
+                return BOARD_UNIT_PIVOT
+            elif fill:
+                return BOARD_UNIT
+            elif pivot:
+                return BOARD_PIVOT
         return BOARD_EMPTY
 
 
