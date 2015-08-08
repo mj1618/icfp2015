@@ -35,25 +35,42 @@ class BasicAlgorithm:
 
         pws = KnownWords
         success = False
-        for w in pws.words:
-            pw=Power(w,pws.decode(w))
-            step = self.board.action_step(pw)
-            if self.board.is_complete():
-                return
-            elif self.board.error:
-                self.board.undo_last_step()
-            elif pw.completed:
-                success=True
-                break
-        if not success:
-            ms = [Move(E),Move(SE),Move(SW),Move(W)]
-            random.shuffle(ms)
-            for cmd in ms:
-                step = self.board.step(cmd)
+        self.i += 1
+        random.shuffle(pws.words)
+        if self.i %1 ==0:
+            for w in pws.words:
+                pw=Power(w,pws.decode(w))
+                step = self.board.action_step(pw)
                 if self.board.is_complete():
                     return
                 elif self.board.error:
                     self.board.undo_last_step()
-                else:
+                elif pw.completed:
                     success=True
                     break
+
+
+
+        # if not success:
+        ms = [Move(E),Move(SE),Move(SW),Move(W)]
+        for cmd in ms:
+            sources = self.board.sources_remaining
+            # print("sources before: %d"%sources)
+
+            step = self.board.step(cmd)
+            # print("sources after: %d"%self.board.sources_remaining)
+            if self.board.is_complete():
+                print("completing")
+                return
+            elif self.board.error:
+                self.board.undo_last_step()
+            elif ms.index(cmd)==3:
+                success=True
+                break
+            elif sources != self.board.sources_remaining:
+                self.board.undo_last_step()
+            else:
+                success=True
+                break
+
+

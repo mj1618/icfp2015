@@ -1,10 +1,12 @@
 #!/usr/bin/env python
-
+import http.client
 import json
 import urllib.request
-
+import urllib.parse
+import ssl
 from point import Pt
 from unit import Unit
+import base64
 
 QUALIFIER_PROBLEM_URL = "http://icfpcontest.org/problems/problem_{}.json"
 
@@ -20,6 +22,16 @@ def get_qualifier_problems(*args):
 
     return problem_data
 
+def submit(data):
+    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+    context.verify_mode = ssl.CERT_REQUIRED
+    context.load_verify_locations('C:\\Users\\Matt\\cacert.pem')
+    h = http.client.HTTPSConnection('davar.icfpcontest.org',443,context=context)
+    # url_params = urllib.parse.urlencode(json.dumps(data))
+    headers = { 'Content-Type' : 'application/json', "Authorization" : 'Basic '+base64.b64encode(b":lI/jYDtQwdrf4s+SDq6WW91LW5bXpH04ZWhIUI+clxo=").decode("ascii") }
+    h.request('POST', '/teams/77/solutions', json.dumps(data), headers)
+    r1 = h.getresponse()
+    print(r1.status, r1.reason)
 
 def loader(input_data):
     data_filthy = json.loads(input_data)
