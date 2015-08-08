@@ -52,7 +52,7 @@ class Board:
             self.record_solution()
         return current_step
 
-    def undo_last_command(self):
+    def undo_last_step(self):
         self.error=False
         self.is_full = False
         for action in self.steps.pop().actions:

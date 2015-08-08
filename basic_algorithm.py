@@ -43,8 +43,8 @@ class BasicAlgorithm:
         step = self.board.step(cmd)
 
         # if self.board.is_complete() and self.last_pos.y < self.board.height/2:
-        #     self.board.undo_last_command()
+        #     self.board.undo_last_step()
         if self.board.is_complete():
             return
         elif self.board.error:
-            self.board.undo_last_command()
+            self.board.undo_last_step()
