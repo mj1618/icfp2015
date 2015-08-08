@@ -53,7 +53,7 @@ def animate(delay=0.1):
     return show_frame
 
 def main(args):
-    probs = loader.get_qualifier_problems(1)
+    probs = loader.get_qualifier_problems(args.p)
     
     test_prob = probs[0]
     test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0])
@@ -96,6 +96,7 @@ group = opts.add_mutually_exclusive_group()
 group.add_argument("-v", help="display board state at each step", action="store_true")
 group.add_argument("-a", help="animate board state (specify again for slower frames)", action="count")
 group.add_argument("-r", help="run replay test", action="store_true")
+opts.add_argument("-p", type=int, help="select a qualifying problem", default=1)
 
 if __name__ == "__main__":
     args = opts.parse_args()
