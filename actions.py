@@ -69,12 +69,12 @@ class RngAction(Action):
         self.old_seed = board.old_seed
         self.seed=board.seed
         board.old_seed = board.seed
-        board.seed = (RNG_MULT*board.seed+RNG_INC % RNG_MOD)
+        board.seed = ((RNG_MULT*board.seed+RNG_INC) % RNG_MOD)
         return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
     def undo(self,board):
         board.seed=self.seed
-        board.old_seed=self.seed
+        board.old_seed=self.old_seed
         # return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
 class Power(Action):
@@ -129,13 +129,10 @@ class NewUnitAction(Action):
         r = board.rng_action()
         self.index = r
 
-        board.current_unit = board.units[r]
-        board.units.pop(r)
+        board.current_unit = copy.copy(board.units[r])
 
     def undo(self,board):
         if board.current_unit is not None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
         board.current_unit=self.unit
-        if self.unit is not None:
-            board.units.insert(self.index,self.unit)

@@ -14,16 +14,17 @@ class ReplayAlgorithm:
         for i, c in enumerate(self.input_string):
             if self.board.is_complete():
                 print("Board complete, terminating")
-                break
+                return
             if c not in chars_reverse:
                 print("Hit invalid character {}, aborting".format(c))
-                break
+                return
             self.board.step(chars_reverse[c])
             if self.animation_delay:
                 os.system('cls' if os.name == 'nt' else 'clear')
 
             print("Step {}: {} => {}".format(i, c, chars_reverse[c]))
             print(self.board)
-            
+            print("")
             if self.animation_delay:
                 time.sleep(self.animation_delay)
+        print("It's over!")
