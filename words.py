@@ -9,7 +9,10 @@ chars[Move(SE)] = "lmno 5"
 chars[Rotation(Clockwise)] = "dqrvz1"
 chars[Rotation(Counterwise)] = "kstuwx"
 
-
+chars_reverse = {}
+for key, val in chars.items():
+    for char in val:
+        chars_reverse[char] = key
 
 
 class PowerWords:

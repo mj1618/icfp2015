@@ -6,7 +6,15 @@ from unit import *
 from point import *
 from actions import *
 from basic_algorithm import *
+from replay_algorithm import *
 # import pdb
+
+def replay_test():
+    prob = loader.get_qualifier_problems(6)[0]
+    board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=prob["sourceSeeds"][0])
+    alg = ReplayAlgorithm(board, "iiiiiiimimiiiiiimmimiiiimimimmimimimimmeemmimimiimmmmimmimiimimimmimmimeeemmmimimmimeeemiimiimimimiiiipimiimimmmmeemimeemimimimmmmemimmimmmiiimmmiiipiimiiippiimmmeemimiipimmimmipppimmimeemeemimiieemimmmm", animation_delay=0.2)
+    alg.start()
+
 
 def main():
     probs = loader.get_qualifier_problems(1)
