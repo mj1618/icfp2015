@@ -119,9 +119,9 @@ class Board:
         return False
 
     def calculate_score(self):
-        points = len(self.current_unit.mask) + 100*(1+self.current_lines_cleared)*self.current_lines_cleared/2
+        points = len(self.current_unit.mask) + 100*(1+self.current_lines_cleared)*self.current_lines_cleared//2
         if self.old_lines_cleared > 1:
-            line_bonus = (self.old_lines_cleared-1)*points/10
+            line_bonus = (self.old_lines_cleared-1)*points//10
         else:
             line_bonus=0
         move_score = points+line_bonus
