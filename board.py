@@ -62,7 +62,7 @@ class Board:
             self.step_hook(self, False, cmd)
         return current_step
     
-    def action_step(self,action):
+    def power_step(self,action):
         if self.current_unit is None:
             self.next_unit_action()
         else:

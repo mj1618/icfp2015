@@ -123,7 +123,7 @@ class Power(Action):
 """Only used for testing to put units in different places"""
 class SetUnitAction(Action):
     def __init__(self,unit):
-        self.unit=unit
+        self.unit=copy.deepcopy(unit)
 
     def do(self,board):
         board.current_unit = self.unit
