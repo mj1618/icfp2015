@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+import argparse
+import time
+
 from pprint import pprint
 import loader
 from board import *
@@ -14,7 +17,7 @@ def replay_test():
     prob = loader.get_qualifier_problems(6)[0]
     board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=0)
     print(len(board.units))
-    alg = ReplayAlgorithm(board, "iiiiiiimimiiiiiimmimiiiimimimmimimimimmeemmimimiimmmmimmimiimimimmimmimeeemmmimimmimeeemiimiimimimiiiipimiimimmmmeemimeemimimimmmmemimmimmmiiimmmiiipiimiiippiimmmeemimiipimmimmipppimmimeemeemimiieemimmmm", animation_delay=0.1)
+    alg = ReplayAlgorithm(board, "iiiiiiimimiiiiiimmimiiiimimimmimimimimmeemmimimiimmmmimmimiimimimmimmimeeemmmimimmimeeemiimiimimimiiiipimiimimmmmeemimeemimimimmmmemimmimmmiiimmmiiipiimiiippiimmmeemimiipimmimmipppimmimeemeemimiieemimmmm", Animator())
     alg.start()
 
 def display(board, is_undo, cmd):
@@ -23,7 +26,33 @@ def display(board, is_undo, cmd):
     print("   Score:", board.score)
     print("")
 
-def main():
+class Animator:
+    def __init__(self, delay=0.1):
+        self.last_frame = None
+        self.delay = delay
+
+    def next_frame(self):
+        # sleep until next frame, if necessary
+        now = time.time()
+        if self.last_frame is not None:
+            deadline = self.last_frame + self.delay
+            while now < deadline:
+                time.sleep(deadline - now)
+                now = time.time()
+        self.last_frame = now
+        # clear screen
+        print("\033[H\033[J")
+        #os.system('cls' if os.name == 'nt' else 'clear')
+
+# returns a step_hook suitabe function
+def animate(delay=0.1):
+    animator = Animator(delay)
+    def show_frame(board, is_undo, cmd):
+        animator.next_frame()
+        display(board, is_undo, cmd)
+    return show_frame
+
+def main(args):
     probs = loader.get_qualifier_problems(1)
     
     test_prob = probs[0]
@@ -37,7 +66,13 @@ def main():
     # test_board.step(Rotation(Clockwise))
     # pdb.set_trace()
 
-    algo = BasicAlgorithm(test_board, step_hook=display)
+    hook = None
+    if args.v:
+        hook = display
+    elif args.a:
+        hook = animate(args.a/10)
+
+    algo = BasicAlgorithm(test_board, step_hook=hook)
     algo.start()
 
     print("%d"%test_board.score)
@@ -56,5 +91,15 @@ def main():
     #         if type(action) is CommandAction:
     #
 
+opts = argparse.ArgumentParser()
+group = opts.add_mutually_exclusive_group()
+group.add_argument("-v", help="display board state at each step", action="store_true")
+group.add_argument("-a", help="animate board state (specify again for slower frames)", action="count")
+group.add_argument("-r", help="run replay test", action="store_true")
+
 if __name__ == "__main__":
-    main()
+    args = opts.parse_args()
+    if args.r:
+        replay_test()
+    else:
+        main(args)
