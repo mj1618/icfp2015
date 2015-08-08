@@ -29,4 +29,9 @@ class PowerWords:
 KnownWords = PowerWords("Ei!","Ia! Ia!","R'lyeh","Yuggoth","cthulhu")
 
 if __name__ == "__main__":
-    assert KnownWords.decode("ei!") == [Move(E), Move(SW), Move(W)]
+    w, sw, se, e = Move(W), Move(SW), Move(SE), Move(E)
+    cw, ccw = Rotation(Clockwise), Rotation(Counterwise)
+    assert KnownWords.decode("ei!") == [e, sw, w]
+    assert KnownWords.decode("yuggoth") == [e, ccw, sw, sw, se, ccw, sw]
+    assert KnownWords.decode("cthulhu") == [e, ccw, sw, ccw, se, sw, ccw]
+    assert KnownWords.decode("r'lyeh") == [cw, w, se, e, e, sw]

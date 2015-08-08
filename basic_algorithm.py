@@ -8,10 +8,12 @@ from actions import *
 from random import randint
 from unit import *
 class BasicAlgorithm:
-    def __init__(self,board):
+    def __init__(self,board,step_hook=None):
         self.board=board
         self.last_pos = [0,0]
         self.i = 0
+        if step_hook is not None:
+            board.install_step_hook(step_hook)
 
 
     def start(self):

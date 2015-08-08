@@ -21,11 +21,13 @@ class ReplayAlgorithm:
                 break
             self.board.step(cmd)
             if self.animation_delay:
-                os.system('cls' if os.name == 'nt' else 'clear')
+                print("\033[H\033[J") #clear screen
+                #os.system('cls' if os.name == 'nt' else 'clear')
 
             print("Step {}: {} => {}".format(i, c, cmd))
             print(self.board)
             print("")
+            print("  Score: {}".format(self.board.score))
             if self.animation_delay:
                 time.sleep(self.animation_delay)
         print("End of input")
