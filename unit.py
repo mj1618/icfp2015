@@ -10,17 +10,29 @@ UNIT_PIVOT = u"¨"
 UNIT_UNIT_PIVOT = u"Ü"
 
 class Command:
-    pass
+    # the keys specify the set of possible commands. instances are initialised lazily
+    instances = {W: None, E: None, SW: None, SE: None, Clockwise: None, Counterwise: None}
 
 class Move(Command):
+    def __new__(cls, dir):
+        if Command.instances[dir] is None:
+            Command.instances[dir] = super(Move, cls).__new__(cls)
+        return Command.instances[dir]
     def __init__(self, dir):
         self.dir = dir
     def __repr__(self):
-        return str(self.dir)
+        return "Move" + str(self.dir)
 
 class Rotation(Command):
+    instances = {Clockwise: None, Counterwise: None}
+    def __new__(cls, rot):
+        if Command.instances[rot] is None:
+            Command.instances[rot] = super(Rotation, cls).__new__(cls)
+        return Command.instances[rot]
     def __init__(self, rot):
         self.rot = rot
+    def __repr__(self):
+        return "Rotation(%swise)" % ("Clock" if self.rot is Clockwise else "Counter")
 
 
 def bounds(pts):
@@ -45,7 +57,7 @@ class Unit:
 
 
     def command(self,cmd):
-        self.old_states.append([self.pivot.copy(),self.current_rotation])
+        self.old_states.append([self.pivot,self.current_rotation])
         if type(cmd) is Move:
             self.move(cmd.dir)
         else:

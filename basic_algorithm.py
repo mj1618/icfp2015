@@ -31,7 +31,7 @@ class BasicAlgorithm:
         # elif r==3:
         #     cmd=Move(W)
 
-        pws = PowerWords()
+        pws = KnownWords
         success = False
         for w in pws.words:
             pw=Power(w,pws.decode(w))
