@@ -35,28 +35,33 @@ class PlacerAlgorithm:
         #if unit.pivot.y %2:
         #    unit_x_left
 
-        candidates = []
+        candidate_surfaces = set()
         for p in points:
             if (p.move(SW) not in points) or (p.move(SE) not in points):
                 delta = p.delta(unit.pivot)
                 print((p, delta))
-                candidates.append(delta)
+                candidate_surfaces.add(delta)
 
-
+        candidate_pivots = set()
 
         # for each of the generated unit placement spots
         for x, y in enumerate(heightmap):
             target = Pt(x, y-1)
            
             # for each target surface on unit
-            for c in candidates:
-                # place the unit at the spot temporarily
-                unit.pivot = target.move(c)
+            for c in candidate_surfaces:
+                candidate_pivots.add(target.move(c))
+        
+        for p in candidate_pivots:
+            # place the unit at the spot temporarily
+            unit.pivot = p
+            if self.board.is_lock():
+                continue
 
-                # score the board
-                print(self.board)
+            # score the board
+            print(self.board)
 
-                # record the score, undo placement
+            # record the score, undo placement
         
         # carry out best move
 

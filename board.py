@@ -124,10 +124,14 @@ class Board:
                 self.next_unit_action()
         self.current_actions.append(CommandAction(cmd,lock))
 
+
+    def is_cell_valid(self, point):
+        return not ((point.x < 0) or (point.x >= self.width) or (point.y < 0) or (point.y >= self.height))
+
     def is_lock(self):
         if self.current_unit is not None:
             for pt in self.current_unit.get_pts():
-                if pt.x>=self.width or pt.y>=self.height or pt.x<0 or pt.y<0 or self.grid[pt.y][pt.x]==1:
+                if not self.is_cell_valid(pt) or self.grid[pt.y][pt.x]==1:
                     return True
         else: return True
         return False
@@ -142,8 +146,7 @@ class Board:
         return move_score
 
     def query_cell(self, y, x):
-        assert (y >= 0) and (y < self.height)
-        assert (x >= 0) and (x < self.width)
+        assert self.is_cell_valid(Pt(x,y))
         if self.grid[y][x]:
             return BOARD_FILL
         elif self.current_unit is not None:
@@ -168,12 +171,10 @@ class Board:
         column = 0
         row = 0
 
-        _is_valid = lambda p: (p.x >=0) and (p.y >=0) and (p.x < self.width) and (p.y < self.height)
-
         def _follow(p):
             ne = p.move(NE)
             
-            if _is_valid(ne) and self.grid[ne.y][ne.x] == 1:
+            if self.is_cell_valid(ne) and self.grid[ne.y][ne.x] == 1:
                 result = _follow(ne)
                 if result != -1:
                     heightmap[ne.x] = max(heightmap[ne.x], ne.y)
@@ -183,14 +184,14 @@ class Board:
                 return p.x
 
             e = p.move(E)
-            if (e.y == self.height) or (_is_valid(e) and self.grid[e.y][e.x]) == 1:
+            if (e.y == self.height) or (self.is_cell_valid(e) and self.grid[e.y][e.x]) == 1:
                 result = _follow(e)
                 if result != -1:
                     heightmap[e.x] = max(heightmap[e.x], e.y)
                 return result
                     
             se = p.move(SE)
-            if _is_valid(se) and self.grid[se.y][se.x] == 1:
+            if self.is_cell_valid(se) and self.grid[se.y][se.x] == 1:
                 result = _follow(se)
                 if result != -1:
                     heightmap[se.x] = max(heightmap[se.x], se.y)
@@ -222,6 +223,8 @@ class Board:
 
 
     def is_hole(self, point):
+        assert self.is_cell_valid(point)
+
         if self.grid[y][x] == 1:
             return 0
 
@@ -257,3 +260,5 @@ class Board:
 
     def get_cell_count(self):
         return sum([sum(r) for r in self.cells])
+
+

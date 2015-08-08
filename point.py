@@ -22,6 +22,9 @@ class Pt:
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
+    def __hash__(self):
+        return hash(repr(self))
+
     def move(self, hex):
         bias = self.y % 2
         x = self.x + hex.e + (hex.se - hex.sw + bias) // 2
@@ -79,7 +82,7 @@ class HexPt:
         return self.e == other.e and self.se == other.se and self.sw == other.sw
 
     def __hash__(self):
-        return self.e + 13*(self.se + 13*(self.sw))
+        return hash(repr(self))
 
     def clockwise(self):
         """Rotates this point clockwise around 0E 0SE 0SW"""
