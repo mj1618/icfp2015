@@ -83,7 +83,7 @@ class Unit:
     def is_error(self):
         for state in self.old_states:
             if self.pivot == state[0] and self.rotation_matches(state[1]):
-                print("Error state")
+                # print("Error state")
                 return True
         return False
 
