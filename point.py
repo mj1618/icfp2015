@@ -29,15 +29,17 @@ class Pt:
         return Pt(x, y)
 
     def delta(self, pivot):
-        dx = pivot.x - self.x
-        dy = pivot.y - self.y
-        if dy >= 0:
-            se = dy if abs(dx) > abs(dy) else dx
-            return HexPt(dx - se, se, dy - se)
-        else:
-            ne = dy if abs(dx) > abs(dy) else dx
-            return HexPt(dx - ne, dy + ne, -ne)
-
+        """ Returns a HexPt that takes you from pivot -> self """
+        dx = self.x - pivot.x
+        dy = self.y - pivot.y
+        bias = pivot.y % 2
+        # get first solution by setting se = 0
+        e, sw, se = dx - (-dy + bias) // 2, dy, 0
+        if (e > 0 and sw > 0) or (e < 0 and sw < 0):
+            # convert to canonical form
+            n = e if abs(e) < abs(sw) else sw
+            e -= n; sw -= n; se += n
+        return HexPt(e, se, sw)
 
 class HexPt:
     """ A relative point based on hex directions. """
@@ -80,21 +82,28 @@ Clockwise = HexPt.clockwise
 Counterwise = HexPt.counterwise
 
 if __name__ == "__main__":
-    assert Pt(1,1).move(W) == Pt(0,1)
-    assert Pt(1,1).move(E) == Pt(2,1)
-    assert Pt(1,1).move(NW) == Pt(1,0)
-    assert Pt(1,1).move(NE) == Pt(2,0)
-    assert Pt(1,1).move(SW) == Pt(1,2)
-    assert Pt(1,1).move(SE) == Pt(2,2)
-    assert Pt(1,2).move(W) == Pt(0,2)
-    assert Pt(1,2).move(E) == Pt(2,2)
-    assert Pt(1,2).move(NW) == Pt(0,1)
-    assert Pt(1,2).move(NE) == Pt(1,1)
-    assert Pt(1,2).move(SW) == Pt(0,3)
-    assert Pt(1,2).move(SE) == Pt(1,3)
-    assert Pt(1,1).move(HexPt(0,2,0)) == Pt(2,3)
-    assert Pt(1,2).move(HexPt(0,2,0)) == Pt(2,4)
-    assert Pt(2,3).move(HexPt(0,-2,0)) == Pt(1,1)
-    assert Pt(2,3).move(HexPt(0,0,-2)) == Pt(3,1)
-    assert Pt(2,3).move(HexPt(0,-1,-2)) == Pt(3,0)
-    assert Pt(2,4).move(HexPt(1,1,0)) == Pt(3,5)
+    def check(start, dir, end):
+        try:
+            assert start.move(dir) == end
+            assert end.delta(start) == dir
+        except AssertionError:
+            print(start, dir, end, start.move(dir), end.delta(start))
+            raise
+    check(Pt(1,1), W, Pt(0,1))
+    check(Pt(1,1), E, Pt(2,1))
+    check(Pt(1,1), NW, Pt(1,0))
+    check(Pt(1,1), NE, Pt(2,0))
+    check(Pt(1,1), SW, Pt(1,2))
+    check(Pt(1,1), SE, Pt(2,2))
+    check(Pt(1,2), W, Pt(0,2))
+    check(Pt(1,2), E, Pt(2,2))
+    check(Pt(1,2), NW, Pt(0,1))
+    check(Pt(1,2), NE, Pt(1,1))
+    check(Pt(1,2), SW, Pt(0,3))
+    check(Pt(1,2), SE, Pt(1,3))
+    check(Pt(1,1), HexPt(0,2,0), Pt(2,3))
+    check(Pt(1,2), HexPt(0,2,0), Pt(2,4))
+    check(Pt(2,3), HexPt(0,-2,0), Pt(1,1))
+    check(Pt(2,3), HexPt(0,0,-2), Pt(3,1))
+    check(Pt(2,3), HexPt(0,-1,-2), Pt(3,0))
+    check(Pt(2,4), HexPt(1,1,0), Pt(3,5))

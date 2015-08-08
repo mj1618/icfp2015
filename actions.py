@@ -97,8 +97,6 @@ class NewUnitAction(Action):
         self.index = r
         board.current_unit = board.units[r]
         board.units.pop(r)
-        while board.current_unit.top_left_pt().x < (board.width - board.current_unit.top_right_pt().x - 1):
-            board.current_unit.move(E)
     def undo(self,board):
         if board.current_unit is not None:
             for pt in board.current_unit.get_pts():

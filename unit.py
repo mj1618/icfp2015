@@ -22,10 +22,24 @@ class Rotation(Command):
     def __init__(self, rot):
         self.rot = rot
 
+
+def bounds(pts):
+    # left right top bottom
+    l, r, t, b = pts[0].x, pts[0].x, pts[0].y, pts[0].y
+    for p in pts[1:]:
+        if p.x < l: l = p.x;
+        elif p.x > r: r = p.x;
+        if p.y < t: t = p.y;
+        elif p.y > b: b = p.y;
+    return l, r, t, b
+
 class Unit:
-    def __init__(self, pts, pivot):
-        self.pivot = pivot
-        self.mask = [pt.delta(pivot) for pt in pts]
+    def __init__(self, pts, pivot, board_width):
+        l, r, t, b = bounds(pts)
+        col0 = (board_width - (r - l + 1)) // 2
+        offset = Pt(l - col0, -t)
+        self.pivot = pivot + offset
+        self.mask = [(pt + offset).delta(self.pivot) for pt in pts]
         self.old_states = []
         self.current_rotation=NE
 
@@ -78,14 +92,6 @@ class Unit:
             if pt.x==x and pt.y == y:
                 return True
         return False
-
-    def row(self,y):
-        return [ pt for pt in self.get_pts() if (pt.y == y)]
-
-    def top_left_pt(self):
-        return min(self.row(0), key=lambda pt: pt.x)
-    def top_right_pt(self):
-        return max(self.row(0), key=lambda pt: pt.x)
 
     def __str__(self):
         bbox = [self.pivot.x, self.pivot.y, self.pivot.x, self.pivot.y]
