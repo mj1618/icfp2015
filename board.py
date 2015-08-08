@@ -223,19 +223,26 @@ class Board:
 
 
 
-    def is_hole(self, point):
+    def is_hole(self, point, include_unit=False):
         assert self.is_cell_valid(point)
 
-        if self.grid[y][x] == 1:
+        unit_points = self.current_unit.get_pts()
+
+        def _fetch(y, x):
+            if include_unit and (Pt(y, x) in unit_points):
+                return 1
+            return self.grid[y][x]
+
+        if _fetch(point.y, point.x) == 1:
             return 0
 
         x, y = point.x, point.y
-        l = 1 if (x == 0) else self.grid[y][x-1]
-        r = 1 if (x == self.width-1) else self.grid[y][x+1]
-        tl = 1 if (y == 0) else (1 if ((x==0) and (y-1)%2) else self.grid[y-1][x-((y-1)%2)])
-        tr = 1 if (y == 0) else  (1 if ((x==self.width-1) and (y%2)) else self.grid[y-1][x+(y%2)])
-        bl = 1 if (y == self.height-1) else (1 if ((x==0) and (y-1)%2) else self.grid[y+1][x-((y+1)%2)])
-        br = 1 if (y == self.height-1) else (1 if ((x==self.width-1) and y%2) else self.grid[y+1][x+(y%2)])
+        l = 1 if (x == 0) else _fetch(y, x-1)
+        r = 1 if (x == self.width-1) else _fetch(y, x+1)
+        tl = 1 if (y == 0) else (1 if ((x==0) and (y-1)%2) else _fetch(y-1, x-((y-1)%2)))
+        tr = 1 if (y == 0) else  (1 if ((x==self.width-1) and (y%2)) else _fetch(y-1, x+(y%2)))
+        bl = 1 if (y == self.height-1) else (1 if ((x==0) and (y-1)%2) else _fetch(y+1, x-((y+1)%2)))
+        br = 1 if (y == self.height-1) else (1 if ((x==self.width-1) and y%2) else _fetch(y+1, x+(y%2)))
         
         hole = 0
         hole |= (l and r) or (tl and br) or (bl and tr)
@@ -246,11 +253,11 @@ class Board:
 
         return hole
 
-    def get_hole_count(self):
+    def get_hole_count(self, include_unit=False):
         count = 0
         for y in range(self.height):
             for x in range(self.width):
-                count += self.is_hole(Pt(x,y))
+                count += self.is_hole(Pt(x,y), include_unit=include_unit)
         return count
  
     def get_max_altitude(self):
