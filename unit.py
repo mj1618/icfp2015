@@ -109,11 +109,18 @@ class Unit:
             bbox[3] = max(bbox[3], p.y)
         offset = Pt(bbox[0], bbox[1])
         dims = Pt(bbox[2]+1, bbox[3]+1) - offset
-        if self.pivot.y-offset.y % 2:
+
+        #print("offset, dims")
+        #print((offset, dims))
+        
+        #print("{} {}".format("ODD" if self.pivot.y%2 else "EVEN", "ODD" if offset.y%2 else "EVEN"))
+
+        if ((self.pivot.y-offset.y+1) % 2) and (dims.y > 1) and not ((self.pivot.y+1%2) and (offset.y+1%2)):
             offset.y -= 1
             dims.y += 1
-        #print("offset, dims")
-        #print((offset, dims)) 
+        elif (self.pivot.y+1%2) and (offset.y%2):
+            offset.y -= 1
+            dims.y += 1
         grid = [[0 for x in range(dims.x)] for y in range(dims.y)]
 
         #print("points out:")
@@ -122,6 +129,7 @@ class Unit:
             #print("{} => {}".format(p, p_abs))
             grid[p_abs.y][p_abs.x] = 1
         grid[self.pivot.y-offset.y][self.pivot.x-offset.x] |= 2
+
 
         def query_func(y, x):
             choices = (UNIT_EMPTY, UNIT_UNIT, UNIT_PIVOT, UNIT_UNIT_PIVOT)
