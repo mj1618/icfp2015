@@ -27,4 +27,6 @@ class ReplayAlgorithm:
             print("")
             if self.animation_delay:
                 time.sleep(self.animation_delay)
-        print("It's over!")
+        print("End of input")
+        if self.board.is_complete():
+            print("Which is convenient, as we ran out of board")

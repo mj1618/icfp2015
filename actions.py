@@ -116,23 +116,31 @@ class NewUnitAction(Action):
 
         self.unit = board.current_unit
 
-
+        # convert previous current_unit into filled cells
         if board.current_unit != None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
-
 
         if len(board.units)==0:
             board.current_unit = None
             return
 
+        
+
         r = board.rng_action()
         self.index = r
+        new_unit = copy.deepcopy(board.units[r])
 
-        board.current_unit = copy.deepcopy(board.units[r])
+        board.current_unit = new_unit
+        for p in new_unit.get_pts():
+            if board.grid[p.y][p.x] == 1:
+                board.is_full = True
+                break
+
 
     def undo(self,board):
         if board.current_unit is not None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
         board.current_unit=self.unit
+        board.is_full = False

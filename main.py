@@ -13,7 +13,7 @@ def replay_test():
     prob = loader.get_qualifier_problems(6)[0]
     board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=0)
     print(len(board.units))
-    alg = ReplayAlgorithm(board, "iiiiiiimimiiiiiimmimiiiimimimmimimimimmeemmimimiimmmmimmimiimimimmimmimeeemmmimimmimeeemiimiimimimiiiipimiimimmmmeemimeemimimimmmmemimmimmmiiimmmiiipiimiiippiimmmeemimiipimmimmipppimmimeemeemimiieemimmmm", animation_delay=0.2)
+    alg = ReplayAlgorithm(board, "iiiiiiimimiiiiiimmimiiiimimimmimimimimmeemmimimiimmmmimmimiimimimmimmimeeemmmimimmimeeemiimiimimimiiiipimiimimmmmeemimeemimimimmmmemimmimmmiiimmmiiipiimiiippiimmmeemimiipimmimmipppimmimeemeemimiieemimmmm", animation_delay=0.1)
     alg.start()
 
 
