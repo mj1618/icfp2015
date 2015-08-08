@@ -4,12 +4,15 @@ import json
 import urllib.request
 
 from point import Pt
+from unit import Unit
 
 QUALIFIER_PROBLEM_URL = "http://icfpcontest.org/problems/problem_{}.json"
 
-def get_qualifier_problems():
+def get_qualifier_problems(*args):
+    if len(args) == 0:
+        args = range(24)
     problem_data = []
-    for i in range(24):
+    for i in args:
         url = QUALIFIER_PROBLEM_URL.format(i)
         print("Loading {}...".format(url))
         data = urllib.request.urlopen(url).read().decode("utf8")
@@ -47,10 +50,10 @@ def loader(input_data):
         for member in unit.get("members", []):
             member_p = Pt(int(member.get("x", -1)), member.get("y", -1))
             assert is_valid_point(member_p)
-            member_p -= pivot_p
             members.append(member_p)
-
-        data["units"].append(members)
+        
+        unit = Unit(members, pivot_p)
+        data["units"].append(unit)
 
 
     return data

@@ -31,8 +31,8 @@ class Board:
 
     solutions = None
 
-    def __init__(self, width, height, fills, units, seed):
-        self.grid = [[0 for x in range(width)] for x in range(height)]
+    def __init__(self, width, height, grid, units, seed):
+        self.grid = grid
         self.width = width
         self.height = height
         self.units = units
@@ -40,20 +40,17 @@ class Board:
         self.old_seed = None
         self.current_unit = None
 
-        for fill in fills:
-            self.grid[fill.x][fill.y] = 1
-
         self.next_unit()
 
     def next_unit(self):
-        self.current_unit = self.units[self.rng(self)]
+        self.current_unit = self.units[self.rng()]
         while self.current_unit.top_left_pt() <  (self.width - self.current_unit.top_right_pt()):
             self.current_unit.move_right()
 
     def rng(self):
         self.old_seed = self.seed
         self.seed = (RNG_MULT*self.seed+RNG_INC % RNG_MOD)
-        return (self.old_seed & RNG_MASK) >> RNG_TRUNC
+        return ((self.old_seed & RNG_MASK) >> RNG_TRUNC) % len(self.units)
 
     def is_incorrect(self):
         for pt in self.current_unit.pts:
