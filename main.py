@@ -5,6 +5,7 @@ from board import *
 from unit import *
 from point import *
 from actions import *
+from words import *
 from basic_algorithm import *
 from replay_algorithm import *
 # import pdb
@@ -42,6 +43,9 @@ def main():
     print("%d"%test_board.score)
 
     print(test_board)
+
+    print(test_board.solutions[0])
+    print(KnownWords.encode(test_board.solutions[0]))
 
     for step in test_board.steps:
         for action in step.actions:
