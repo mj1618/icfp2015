@@ -40,7 +40,7 @@ class BasicAlgorithm:
         if self.i %3 ==0:
             for w in pws.words:
                 pw=Power(w,pws.decode(w))
-                step = self.board.action_step(pw)
+                step = self.board.power_step(pw)
                 if self.board.is_complete():
                     return
                 elif self.board.error:

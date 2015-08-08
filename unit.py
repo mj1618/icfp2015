@@ -105,6 +105,14 @@ class Unit:
                 return True
         return False
 
+    def __eq__(self, other):
+        pts = self.get_pts()
+        for pt in other.get_pts():
+            if pt not in pts:
+                return False
+
+        return True
+
     def __str__(self):
         bbox = [self.pivot.x, self.pivot.y, self.pivot.x, self.pivot.y]
         points = []
