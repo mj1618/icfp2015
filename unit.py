@@ -95,7 +95,7 @@ class Unit:
         for m in self.mask:
             p = self.pivot.move(m)
             points.append(p)
-            print("{} => {}".format(m,p))
+            #print("{} => {}".format(m,p))
 
             bbox[0] = min(bbox[0], p.x)
             bbox[1] = min(bbox[1], p.y)
