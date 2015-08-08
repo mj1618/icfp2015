@@ -46,14 +46,20 @@ def bounds(pts):
     return l, r, t, b
 
 class Unit:
-    def __init__(self, pts, pivot, board_width):
-        l, r, t, b = bounds(pts)
-        col0 = (board_width - (r - l + 1)) // 2
-        offset = Pt(col0 - l, -t)
-        self.pivot = pivot + offset
-        self.mask = [(pt + offset).delta(self.pivot) for pt in pts]
-        self.old_states = []
-        self.current_rotation=NE
+    def __init__(self, pts, pivot, board_width,center=True):
+        if center:
+            l, r, t, b = bounds(pts)
+            col0 = (board_width - (r - l + 1)) // 2
+            offset = Pt(col0 - l, -t)
+            self.pivot = pivot + offset
+            self.mask = [(pt + offset).delta(self.pivot) for pt in pts]
+            self.old_states = []
+            self.current_rotation=NE
+        else:
+            self.pivot = pivot
+            self.mask = [(pt).delta(self.pivot) for pt in pts]
+            self.old_states = []
+            self.current_rotation=NE
 
 
     def command(self,cmd):
@@ -106,6 +112,8 @@ class Unit:
         return False
 
     def __eq__(self, other):
+        if other is None:
+            return False
         pts = self.get_pts()
         for pt in other.get_pts():
             if pt not in pts:

@@ -89,6 +89,7 @@ class Board:
             action.undo(self)
             if self.step_hook is not None and type(action) is CommandAction:
                 self.step_hook(self, True, action.cmd)
+        return step
 
     def is_complete(self):
         return self.sources_remaining==0 or self.is_full
