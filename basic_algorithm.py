@@ -37,7 +37,7 @@ class BasicAlgorithm:
         elif self.i%3==2:
             cmd = Move(W)
 
-
+        self.i+=1
         if self.board.current_unit is not None:
             self.last_pos = self.board.current_unit.pivot
         step = self.board.step(cmd)

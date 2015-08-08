@@ -9,6 +9,7 @@ chars[Move(SE)] = "lmno 5"
 chars[Rotate(clockwise)] = "dqrvz1"
 chars[Rotate(counterwise)] = "kstuwx"
 
+
 class PowerWords:
     def __init__(self, words):
         self.words = [w.to_lower() for w in words]

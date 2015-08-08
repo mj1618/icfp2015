@@ -36,6 +36,7 @@ class Board:
         self.old_lines_cleared = 0
         self.score = 0
         self.error = False
+        self.is_full = False
 
         self.step()
 
@@ -53,11 +54,12 @@ class Board:
 
     def undo_last_command(self):
         self.error=False
+        self.is_full = False
         for action in self.steps.pop().actions:
             action.undo(self)
 
     def is_complete(self):
-        return len(self.units)==0 and self.current_unit is None
+        return ( len(self.units)==0 and self.current_unit is None ) or self.is_full
 
     def record_solution(self):
         solution = []

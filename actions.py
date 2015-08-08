@@ -77,6 +77,22 @@ class RngAction(Action):
         board.old_seed=self.seed
         # return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
+class Power(Action):
+    def __init__(self,cmds):
+        self.cmds=cmds
+    def do(self,board):
+        for cmd in self.cmds:
+            board.step(cmd)
+            if board.error:
+                for i in range(0,self.cmds.index(cmd)):
+                    board.undo_last_command()
+                return False
+        return True
+
+    def undo(self,board):
+        for cmd in self.cmds:
+            board.undo_last_command()
+
 class NewUnitAction(Action):
     def __init__(self):
         self.unit=None
@@ -99,6 +115,9 @@ class NewUnitAction(Action):
         board.units.pop(r)
         while board.current_unit.top_left_pt().x < (board.width - board.current_unit.top_right_pt().x - 1):
             board.current_unit.move(E)
+
+        board.is_full = board.is_lock()
+
     def undo(self,board):
         if board.current_unit is not None:
             for pt in board.current_unit.get_pts():
