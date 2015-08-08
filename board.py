@@ -20,7 +20,7 @@ class Board:
 
     solutions = None
 
-    def __init__(self, width, height, grid, units, seed):
+    def __init__(self, width, height, grid, units, seed, step_hook=None):
         assert height == len(grid)
         for row in grid:
             assert len(row) == width
@@ -39,8 +39,12 @@ class Board:
         self.score = 0
         self.error = False
         self.is_full = False
+        self.step_hook = step_hook
 
         self.step()
+
+    def install_step_hook(self, step_hook):
+        self.step_hook = step_hook
 
     def step(self,cmd=None):
         if self.current_unit is None:
@@ -52,6 +56,8 @@ class Board:
         self.current_actions=[]
         if self.is_complete():
             self.record_solution()
+        if self.step_hook is not None:
+            self.step_hook(self, False, cmd)
         return current_step
     def action_step(self,action):
         if self.current_unit is None:
@@ -71,8 +77,11 @@ class Board:
     def undo_last_step(self):
         self.error=False
         self.is_full = False
+        step = self.steps.pop()
         for action in self.steps.pop().actions:
             action.undo(self)
+            if self.step_hook is not None and type(action) is CommandAction:
+                self.step_hook(self, True, action.cmd)
 
     def is_complete(self):
         return ( len(self.units)==0 and self.current_unit is None ) or self.is_full

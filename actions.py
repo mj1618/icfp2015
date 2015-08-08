@@ -112,6 +112,7 @@ class NewUnitAction(Action):
     def __init__(self):
         self.unit=None
         self.index = 0
+
     def do(self,board):
 
         self.unit = board.current_unit
@@ -124,8 +125,6 @@ class NewUnitAction(Action):
         if len(board.units)==0:
             board.current_unit = None
             return
-
-        
 
         r = board.rng_action()
         self.index = r

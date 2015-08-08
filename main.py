@@ -16,6 +16,11 @@ def replay_test():
     alg = ReplayAlgorithm(board, "iiiiiiimimiiiiiimmimiiiimimimmimimimimmeemmimimiimmmmimmimiimimimmimmimeeemmmimimmimeeemiimiimimimiiiipimiimimmmmeemimeemimimimmmmemimmimmmiiimmmiiipiimiiippiimmmeemimiipimmimmipppimmimeemeemimiieemimmmm", animation_delay=0.1)
     alg.start()
 
+def display(board, is_undo, cmd):
+    print("%s: %s" % ("UNDO" if is_undo else "DO", str(cmd)))
+    print(board)
+    print("   Score:", board.score)
+    print("")
 
 def main():
     probs = loader.get_qualifier_problems(1)
@@ -31,7 +36,7 @@ def main():
     # test_board.step(Rotation(Clockwise))
     # pdb.set_trace()
 
-    algo = BasicAlgorithm(test_board)
+    algo = BasicAlgorithm(test_board, step_hook=display)
     algo.start()
 
     print("%d"%test_board.score)
