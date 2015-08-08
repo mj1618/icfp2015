@@ -26,6 +26,8 @@ class PlacerAlgorithm:
             input("Press enter to contiue")
             os.system("clear")
 
+        
+
     def step(self):
         heightmap = self.board.get_base_heightmap()
         #unit = copy.deepcopy(self.board.current_unit)
@@ -65,9 +67,10 @@ class PlacerAlgorithm:
             # score the board
 
             holes = self.board.get_holes(include_unit=True)
-            score = len(holes)*20
+            max_alt = self.board.get_max_altitude(include_unit=True)
+            score = len(holes)*20 + max_alt*3
     
-            print("{} => Score {} (Hole count: {})".format(p, score, holes))
+            print("{} => Score {} (Hole count: {}, Max altitude: {})".format(p, score, holes, max_alt))
             print(self.board)
 
             # record the score, undo placement

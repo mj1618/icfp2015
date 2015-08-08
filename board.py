@@ -265,13 +265,19 @@ class Board:
                     holes.add(point)
         return holes
  
-    def get_max_altitude(self):
-        for i, row in enumerate(self.cells):
+    def get_max_altitude(self, include_unit=False):
+
+        alt = self.height
+        for i, row in enumerate(self.grid):
             if any(row):
-                return i
-        return self.height
+                alt = i
+        if include_unit:
+            for pt in self.current_unit.get_pts():
+                if pt.y < alt:
+                    alt = pt.y
+        return self.height-alt
 
     def get_cell_count(self):
-        return sum([sum(r) for r in self.cells])
+        return sum([sum(r) for r in self.grid])
 
 
