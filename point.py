@@ -4,9 +4,6 @@ class Pt:
         self.x = x
         self.y = y
 
-    def copy(self):
-        return Pt(self.x,self.y)
-
     def __add__(self, other):
         return Pt(self.x + other.x, self.y + other.y)
 
@@ -45,11 +42,24 @@ class Pt:
         return HexPt(e, se, sw)
 
 class HexPt:
+    def __new__(cls, e=0, se=0, sw=0, ident=None):
+        if ident is None and len([x for x in [e, se, sw] if x == 0]) == 2:
+            if e == 1: return E
+            elif e == -1: return W
+            elif se == 1: return SE
+            elif se == -1: return NW
+            elif sw == 1: return SW
+            elif sw == -1: return NE
+        return super(HexPt, cls).__new__(cls)
+
     """ A relative point based on hex directions. """
-    def __init__(self, e, se, sw):
+    def __init__(self, e, se, sw, ident=None):
+        if 'e' in self.__dict__:
+            return
         self.e = e
         self.se = se
         self.sw = sw
+        self.ident = ident
 
     def __add__(self, other):
         return HexPt(self.e + other.e, self.se + other.se, self.sw + other.sw)
@@ -61,10 +71,15 @@ class HexPt:
         return HexPt(-self.e, -self.se, -self.sw)
 
     def __repr__(self):
+        if self.ident is not None:
+            return "(%s)" % self.ident
         return "(%dE %dSE %dSW)" % (self.e, self.se, self.sw)
 
     def __eq__(self, other):
         return self.e == other.e and self.se == other.se and self.sw == other.sw
+
+    def __hash__(self):
+        return self.e + 13*(self.se + 13*(self.sw))
 
     def clockwise(self):
         """Rotates this point clockwise around 0E 0SE 0SW"""
@@ -74,12 +89,12 @@ class HexPt:
         """Rotates this point counter-clockwise around 0E 0SE 0SW"""
         return HexPt(self.se, self.sw, -self.e)
 
-NW = HexPt(0, -1, 0)
-NE = HexPt(0, 0, -1)
-E = HexPt(1, 0, 0)
-SE = HexPt(0, 1, 0)
-SW = HexPt(0, 0, 1)
-W = HexPt(-1, 0, 0)
+NW = HexPt(0, -1, 0, "NW")
+NE = HexPt(0, 0, -1, "NE")
+E = HexPt(1, 0, 0, "E")
+SE = HexPt(0, 1, 0, "SE")
+SW = HexPt(0, 0, 1, "SW")
+W = HexPt(-1, 0, 0, "W")
 
 Clockwise = HexPt.clockwise
 Counterwise = HexPt.counterwise

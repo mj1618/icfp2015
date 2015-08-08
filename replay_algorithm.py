@@ -2,7 +2,7 @@
 import os
 import time
 
-from words import chars_reverse
+from words import command
 
 class ReplayAlgorithm:
     def __init__(self, board, input_string, animation_delay=None):
@@ -15,14 +15,15 @@ class ReplayAlgorithm:
             if self.board.is_complete():
                 print("Board complete, terminating")
                 return
-            if c not in chars_reverse:
+            cmd = command.get(c)
+            if cmd is None:
                 print("Hit invalid character {}, aborting".format(c))
-                return
-            self.board.step(chars_reverse[c])
+                break
+            self.board.step(cmd)
             if self.animation_delay:
                 os.system('cls' if os.name == 'nt' else 'clear')
 
-            print("Step {}: {} => {}".format(i, c, chars_reverse[c]))
+            print("Step {}: {} => {}".format(i, c, cmd))
             print(self.board)
             print("")
             if self.animation_delay:
