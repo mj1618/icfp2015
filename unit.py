@@ -88,11 +88,14 @@ class Unit:
         return max(self.row(0), key=lambda pt: pt.x)
 
     def __str__(self):
-        bbox = [0, 0, 0, 0]
+        bbox = [self.pivot.x, self.pivot.y, self.pivot.x, self.pivot.y]
         points = []
+        #print("origin: {}".format(self.pivot))
+        #print("points in:")
         for m in self.mask:
-            p = Pt(0, 0).move(m)
+            p = self.pivot.move(m)
             points.append(p)
+            print("{} => {}".format(m,p))
 
             bbox[0] = min(bbox[0], p.x)
             bbox[1] = min(bbox[1], p.y)
@@ -100,13 +103,19 @@ class Unit:
             bbox[3] = max(bbox[3], p.y)
         offset = Pt(bbox[0], bbox[1])
         dims = Pt(bbox[2]+1, bbox[3]+1) - offset
-        print((offset, dims)) 
+        if self.pivot.y-offset.y % 2:
+            offset.y -= 1
+            dims.y += 1
+        #print("offset, dims")
+        #print((offset, dims)) 
         grid = [[0 for x in range(dims.x)] for y in range(dims.y)]
+
+        #print("points out:")
         for p in points:
             p_abs = p-offset
-            print((p, p_abs))
+            #print("{} => {}".format(p, p_abs))
             grid[p_abs.y][p_abs.x] = 1
-        grid[-offset.y][-offset.x] |= 2
+        grid[self.pivot.y-offset.y][self.pivot.x-offset.x] |= 2
 
         def query_func(y, x):
             choices = (UNIT_EMPTY, UNIT_UNIT, UNIT_PIVOT, UNIT_UNIT_PIVOT)
