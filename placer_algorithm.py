@@ -42,7 +42,7 @@ class PlacerAlgorithm:
             if (p.move(SW) not in points) or (p.move(SE) not in points):
                 delta = p.delta(unit.pivot)
                 print((p, delta))
-                candidate_surfaces.add(delta)
+                candidate_surfaces.add(-delta)
 
         candidate_pivots = set()
 
