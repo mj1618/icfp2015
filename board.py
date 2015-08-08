@@ -251,7 +251,7 @@ class Board:
         br = _fetch(point.move(SE))
         
         hole = 0
-        hole |= (l and r) or (tl and br) or (bl and tr)
+        #hole |= (l and r) or (tl and br) or (bl and tr)
         hole |= (l and tr and br) or (r and tl and bl)
         #if hole:
         #    print("{},{},{},{},{},{} = {}".format(l, tl, tr, r, br, bl, hole))
