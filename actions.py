@@ -120,17 +120,6 @@ class Power(Action):
     def __repr__(self):
         return "PowerAction(%s)" % self.word
 
-"""Only used for testing to put units in different places"""
-class TestPlaceUnitAction(Action):
-    def __init__(self,unit):
-        self.unit=copy.deepcopy(unit)
-
-    def do(self,board):
-        for pt in board.current_unit.get_pts():
-            board.grid[pt.y][pt.x] = 1
-
-    def undo(self,board):
-        pass
 
 
 class NewUnitAction(Action):

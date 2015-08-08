@@ -61,7 +61,11 @@ class Board:
         if self.step_hook is not None:
             self.step_hook(self, False, cmd)
         return current_step
-    
+
+    def place_unit(self,unit):
+        for pt in unit.get_pts():
+            self.grid[pt.y][pt.x] = 1
+
     def power_step(self,action):
         if self.current_unit is None:
             self.next_unit_action()
