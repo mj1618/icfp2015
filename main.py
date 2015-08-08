@@ -11,15 +11,23 @@ from actions import *
 from words import *
 from basic_algorithm import *
 from replay_algorithm import *
+from placer_algorithm import *
 # import pdb
 import sys
 import codecs
 def replay_test():
     prob = loader.get_qualifier_problems(6)[0]
-    board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=0)
+    board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=0, sources_length=prob["sourceLength"])
     print(len(board.units))
     alg = ReplayAlgorithm(board, "iiiiiiimimiiiiiimmimiiiimimimmimimimimmeemmimimiimmmmimmimiimimimmimmimeeemmmimimmimeeemiimiimimimiiiipimiimimmmmeemimeemimimimmmmemimmimmmiiimmmiiipiimiiippiimmmeemimiipimmimmipppimmimeemeemimiieemimmmm", Animator())
     alg.start()
+
+def placer_test():
+    prob = loader.get_qualifier_problems(0)[0]
+    board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=1, sources_length=prob["sourceLength"])
+    alg = PlacerAlgorithm(board)
+    alg.start()
+
 
 def display(board, is_undo, cmd):
     print("%s: %s" % ("UNDO" if is_undo else "DO", str(cmd)))

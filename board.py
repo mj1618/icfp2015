@@ -178,24 +178,24 @@ class Board:
             if self.is_cell_valid(ne) and self.grid[ne.y][ne.x] == 1:
                 result = _follow(ne)
                 if result != -1:
-                    heightmap[ne.x] = max(heightmap[ne.x], ne.y)
+                    heightmap[ne.x] = ne.y
                 return result
             
-            if p.x ==self.width-1:
+            if p.x == (self.width-1):
                 return p.x
 
             e = p.move(E)
             if (e.y == self.height) or (self.is_cell_valid(e) and self.grid[e.y][e.x]) == 1:
                 result = _follow(e)
                 if result != -1:
-                    heightmap[e.x] = max(heightmap[e.x], e.y)
+                    heightmap[e.x] = e.y
                 return result
                     
             se = p.move(SE)
             if self.is_cell_valid(se) and self.grid[se.y][se.x] == 1:
                 result = _follow(se)
                 if result != -1:
-                    heightmap[se.x] = max(heightmap[se.x], se.y)
+                    heightmap[se.x] = se.y
                 return result
 
             # skip backtracking for now
@@ -208,13 +208,13 @@ class Board:
                 if self.grid[row][column] == 1:
                     result = _follow(Pt(column, row))
                     if result != -1:
-                        heightmap[column] = max(heightmap[column], row)
+                        heightmap[column] = row
                         column = result
                         break
                 elif row == self.height-1:
                     result = _follow(Pt(column, row+1))
                     if result != -1:
-                        heightmap[column] = max(heightmap[column], row+1)
+                        heightmap[column] = row+1
                         column = result
                         break
             column += 1
@@ -228,21 +228,22 @@ class Board:
 
         unit_points = self.current_unit.get_pts()
 
-        def _fetch(y, x):
-            if include_unit and (Pt(y, x) in unit_points):
+        def _fetch(pt):
+            if not self.is_cell_valid(pt):
                 return 1
-            return self.grid[y][x]
+            if include_unit and (pt in unit_points):
+                return 1
+            return self.grid[pt.y][pt.x]
 
-        if _fetch(point.y, point.x) == 1:
+        if _fetch(point) == 1:
             return 0
 
-        x, y = point.x, point.y
-        l = 1 if (x == 0) else _fetch(y, x-1)
-        r = 1 if (x == self.width-1) else _fetch(y, x+1)
-        tl = 1 if (y == 0) else (1 if ((x==0) and (y-1)%2) else _fetch(y-1, x-((y-1)%2)))
-        tr = 1 if (y == 0) else  (1 if ((x==self.width-1) and (y%2)) else _fetch(y-1, x+(y%2)))
-        bl = 1 if (y == self.height-1) else (1 if ((x==0) and (y-1)%2) else _fetch(y+1, x-((y+1)%2)))
-        br = 1 if (y == self.height-1) else (1 if ((x==self.width-1) and y%2) else _fetch(y+1, x+(y%2)))
+        l = _fetch(point.move(W))
+        r = _fetch(point.move(E))
+        tl = _fetch(point.move(NW))
+        tr = _fetch(point.move(NE))
+        bl = _fetch(point.move(SW))
+        br = _fetch(point.move(SE))
         
         hole = 0
         hole |= (l and r) or (tl and br) or (bl and tr)
@@ -253,12 +254,16 @@ class Board:
 
         return hole
 
-    def get_hole_count(self, include_unit=False):
+    def get_holes(self, include_unit=False):
         count = 0
+        holes = set()
+
         for y in range(self.height):
             for x in range(self.width):
-                count += self.is_hole(Pt(x,y), include_unit=include_unit)
-        return count
+                point = Pt(x, y)
+                if self.is_hole(point, include_unit=include_unit):
+                    holes.add(point)
+        return holes
  
     def get_max_altitude(self):
         for i, row in enumerate(self.cells):

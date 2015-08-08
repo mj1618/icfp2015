@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import copy
+import os
 
 from point import *
 from unit import *
@@ -22,12 +23,15 @@ class PlacerAlgorithm:
     def start(self):
         while not self.board.is_complete():
             self.step()
+            input("Press enter to contiue")
+            os.system("clear")
 
     def step(self):
         heightmap = self.board.get_base_heightmap()
         #unit = copy.deepcopy(self.board.current_unit)
-        old_hole_count = self.board.get_hole_count()
-        print("Old hole count: {}".format(old_hole_count))
+        old_holes = self.board.get_holes()
+        print("Heightmap: {}".format(heightmap))
+        print("Old hole count: {}".format(old_holes))
 
         unit= self.board.current_unit
         print(unit)
@@ -60,11 +64,11 @@ class PlacerAlgorithm:
 
             # score the board
 
-            hole_count = self.board.get_hole_count(include_unit=True)
-            score = hole_count*20
+            holes = self.board.get_holes(include_unit=True)
+            score = len(holes)*20
     
-            print("{} => Score {} (Hole count: {})".format(p, score, hole_count))
-            #print(self.board)
+            print("{} => Score {} (Hole count: {})".format(p, score, holes))
+            print(self.board)
 
             # record the score, undo placement
             score_table.append((score, p))
