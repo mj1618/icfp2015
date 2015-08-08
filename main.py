@@ -75,19 +75,30 @@ def main(args):
     elif args.a:
         hook = animate(args.a/10)
 
+
+    submit_data = []
+
     algo = BasicAlgorithm(test_board, step_hook=hook)
     algo.start()
 
     print("%d"%test_board.score)
-
     print(test_board)
-
     print(test_board.solutions[0])
     print(KnownWords.encode(test_board.solutions[0]))
+
+    submit_data.append({
+        "problemId": args.p,
+        "seed": test_prob["sourceSeeds"][0],
+        "tag": time.strftime("%H:%M:%S"),
+        "solution": KnownWords.encode(test_board.solutions[0])
+    })
+
 
     for step in test_board.steps:
         for action in step.actions:
             pprint(vars(action))
+    if args.s:
+        loader.submit(submit_data)
     #
     # for step in test_board.steps:
     #     for action in step.actions:
@@ -100,6 +111,8 @@ group.add_argument("-v", help="display board state at each step", action="store_
 group.add_argument("-a", help="animate board state (specify again for slower frames)", action="count")
 group.add_argument("-r", help="run replay test", action="store_true")
 opts.add_argument("-p", type=int, help="select a qualifying problem", default=1)
+opts.add_argument("-s", help="submit solution to the specified problem", action="count")
+
 
 if __name__ == "__main__":
     args = opts.parse_args()
