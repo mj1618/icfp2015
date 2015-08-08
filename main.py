@@ -43,6 +43,30 @@ def display(board, is_undo, cmd):
     print("   Score:", board.score)
     print("")
 
+def run_all():
+
+    for p in range(0,25):
+        print("Problem %d"%p)
+        probs = loader.get_qualifier_problems(p)
+        test_prob = probs[0]
+        test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0],sources_length=test_prob["sourceLength"])
+
+        submit_data = []
+
+        algo = BasicAlgorithm(test_board, step_hook=None)
+        algo.start()
+
+        print("%d"%test_board.score)
+
+        submit_data.append({
+            "problemId": args.p,
+            "seed": test_prob["sourceSeeds"][0],
+            "tag": time.strftime("%H:%M:%S"),
+            "solution": KnownWords.encode(test_board.solutions[0])
+        })
+
+        loader.submit(submit_data)
+
 class Animator:
     def __init__(self, delay=0.1):
         self.last_frame = None
@@ -97,7 +121,6 @@ def main(args):
     algo = BasicAlgorithm(test_board, step_hook=hook)
     algo.start()
 
-    exit()
 
     print("%d"%test_board.score)
     print(test_board)
@@ -130,6 +153,7 @@ group.add_argument("-a", help="animate board state (specify again for slower fra
 group.add_argument("-r", help="run replay test", action="store_true")
 group.add_argument("-pf", help="run path finder test", action="store_true")
 opts.add_argument("-p", type=int, help="select a qualifying problem", default=1)
+opts.add_argument("-all", help="run through and submit all problems", action="store_true")
 opts.add_argument("-s", help="submit solution to the specified problem", action="count")
 
 
@@ -139,5 +163,7 @@ if __name__ == "__main__":
         replay_test()
     if args.pf:
         path_finder_test()
+    if args.all:
+        run_all()
     else:
         main(args)

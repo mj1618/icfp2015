@@ -45,7 +45,7 @@ class RowAction(Action):
         grid = copy.deepcopy(board.grid)
         for x in range(0,board.width):
             grid[0][x] = 0
-        for y in range(1,self.y):
+        for y in range(1,self.y+1):
             for x in range(0,board.width):
                 grid[y][x]=board.grid[y-1][x]
 
@@ -53,7 +53,7 @@ class RowAction(Action):
         grid = copy.deepcopy(board.grid)
         for x in range(0,board.width):
             grid[self.y][x] = 1
-        for y in range(1,self.y):
+        for y in range(1,self.y+1):
             for x in range(0,board.width):
                 grid[y-1][x]=board.grid[y][x]
 
