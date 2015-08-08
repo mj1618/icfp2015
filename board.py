@@ -20,7 +20,7 @@ class Board:
 
     solutions = []
 
-    def __init__(self, width, height, grid, units, seed, step_hook=None):
+    def __init__(self, width, height, grid, units, seed, sources_length, step_hook=None):
         assert height == len(grid)
         for row in grid:
             assert len(row) == width
@@ -38,6 +38,7 @@ class Board:
         self.old_lines_cleared = 0
         self.word_count = {} #map from power word -> number of times used
         self.score = 0
+        self.sources_remaining = sources_length
         self.error = False
         self.is_full = False
         self.step_hook = step_hook
@@ -80,13 +81,13 @@ class Board:
         self.error=False
         self.is_full = False
         step = self.steps.pop()
-        for action in self.steps.pop().actions:
+        for action in step.actions:
             action.undo(self)
             if self.step_hook is not None and type(action) is CommandAction:
                 self.step_hook(self, True, action.cmd)
 
     def is_complete(self):
-        return ( len(self.units)==0 and self.current_unit is None ) or self.is_full
+        return self.sources_remaining==0 or self.is_full
 
     def record_solution(self):
         solution = []

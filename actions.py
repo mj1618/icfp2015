@@ -15,6 +15,8 @@ class Step:
     def undo(self,board):
         for a in self.actions:
             a.undo(board)
+    def __str__(self):
+        return [ str(a) for a in self.actions]
 
 class Action:
     pass
@@ -93,7 +95,7 @@ class Power(Action):
         for cmd in self.cmds:
             board.step(cmd)
             self.steps.append(board.steps.pop())
-            if board.error or (board.is_lock() and self.cmds.index(cmd) < len(self.cmds)-1):
+            if board.error:
                 for step in reversed(self.steps):
                     self.undo_last_step(board,step)
                 return False
@@ -115,6 +117,8 @@ class Power(Action):
                 board.score -= 300
             board.word_count[self.word] = count - 1
 
+    def __repr__(self):
+        return "PowerAction(%s)" % self.word
 
 class NewUnitAction(Action):
     def __init__(self):
@@ -130,13 +134,14 @@ class NewUnitAction(Action):
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
 
-        if len(board.units)==0:
+        if board.sources_remaining==0:
             board.current_unit = None
             return
 
         r = board.rng_action()
         self.index = r
         new_unit = copy.deepcopy(board.units[r])
+        board.sources_remaining-=1
 
         board.current_unit = new_unit
         for p in new_unit.get_pts():
@@ -146,8 +151,9 @@ class NewUnitAction(Action):
 
 
     def undo(self,board):
+        board.current_unit=self.unit
         if board.current_unit is not None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
-        board.current_unit=self.unit
         board.is_full = False
+        board.sources_remaining+=1
