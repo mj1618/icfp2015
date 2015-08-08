@@ -58,7 +58,7 @@ class Unit:
 
     def command(self,cmd):
         self.old_states.append([self.pivot,self.current_rotation])
-        if type(cmd) is Move:
+        if isinstance(cmd, Move):
             self.move(cmd.dir)
         else:
             self.rotate(cmd.rot)

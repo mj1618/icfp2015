@@ -2,6 +2,14 @@
 import copy
 
 from point import *
+from unit import *
+
+class Nothing(Move):
+    def __new__(cls, *args, **kwargs):
+        return object.__new__(cls, *args, **kwargs)
+    
+    def __init__(self):
+        super(Nothing, self).__init__(HexPt(0, 0, 0))
 
 class PlacerAlgorithm:
     def __init__(self, board, step_hook=None):
@@ -12,28 +20,18 @@ class PlacerAlgorithm:
 
 
     def start(self):
-        self.step()
-        #while not self.board.is_complete():
-        #    self.step()
+        while not self.board.is_complete():
+            self.step()
 
     def step(self):
         heightmap = self.board.get_base_heightmap()
         #unit = copy.deepcopy(self.board.current_unit)
+        old_hole_count = self.board.get_hole_count()
+        print("Old hole count: {}".format(old_hole_count))
+
         unit= self.board.current_unit
         print(unit)
         points = unit.get_pts()
-        #unit_y_offset = points[0].y
-        #unit_x_left = points[0].x
-        #unit_x_right = points[0].x
-
-        ##for pt in points[1:]:
-        #    unit_y_offset = max(unit_y_offset, pt.y)
-        #    unit_x_left = min(unit_x_left, pt.x)
-        #    unit_x_right = max(unit_x_right, pt.x)
-        
-        #unit_y_offset = unit.pivot.y-unit_y_offset
-        #if unit.pivot.y %2:
-        #    unit_x_left
 
         candidate_surfaces = set()
         for p in points:
@@ -52,6 +50,8 @@ class PlacerAlgorithm:
             for c in candidate_surfaces:
                 candidate_pivots.add(target.move(c))
         
+        score_table = []
+
         for p in candidate_pivots:
             # place the unit at the spot temporarily
             unit.pivot = p
@@ -59,10 +59,24 @@ class PlacerAlgorithm:
                 continue
 
             # score the board
-            print(self.board)
+
+            hole_count = self.board.get_hole_count(include_unit=True)
+            score = hole_count*20
+    
+            print("{} => Score {} (Hole count: {})".format(p, score, hole_count))
+            #print(self.board)
 
             # record the score, undo placement
-        
+            score_table.append((score, p))
+
+        score_table.sort(key=lambda x: x[0])
+
         # carry out best move
+        print("WINNER: {}".format(score_table[0]))
+        unit.pivot = score_table[0][1]
+        print(self.board)
+        # dummy advance to get a new unit
+        self.board.step(Move(SE))
+        
 
 
