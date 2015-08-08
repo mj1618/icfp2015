@@ -15,6 +15,8 @@ class Step:
     def undo(self,board):
         for a in self.actions:
             a.undo(board)
+    def __str__(self):
+        return [ str(a) for a in self.actions]
 
 class Action:
     pass
@@ -130,13 +132,14 @@ class NewUnitAction(Action):
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
 
-        if len(board.units)==0:
+        if board.sources_remaining==0:
             board.current_unit = None
             return
 
         r = board.rng_action()
         self.index = r
         new_unit = copy.deepcopy(board.units[r])
+        board.sources_remaining-=1
 
         board.current_unit = new_unit
         for p in new_unit.get_pts():
@@ -146,8 +149,9 @@ class NewUnitAction(Action):
 
 
     def undo(self,board):
+        board.current_unit=self.unit
         if board.current_unit is not None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
-        board.current_unit=self.unit
         board.is_full = False
+        board.sources_remaining+=1
