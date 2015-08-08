@@ -28,6 +28,7 @@ def submit(data):
     context.load_verify_locations('C:\\Users\\Matt\\cacert.pem')
     h = http.client.HTTPSConnection('davar.icfpcontest.org',443,context=context)
     # url_params = urllib.parse.urlencode(json.dumps(data))
+    print("Submitting: "+json.dumps(data))
     headers = { 'Content-Type' : 'application/json', "Authorization" : 'Basic '+base64.b64encode(b":lI/jYDtQwdrf4s+SDq6WW91LW5bXpH04ZWhIUI+clxo=").decode("ascii") }
     h.request('POST', '/teams/77/solutions', json.dumps(data), headers)
     r1 = h.getresponse()

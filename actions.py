@@ -120,6 +120,22 @@ class Power(Action):
     def __repr__(self):
         return "PowerAction(%s)" % self.word
 
+"""Only used for testing to put units in different places"""
+class SetUnitAction(Action):
+    def __init__(self):
+        self.unit=None
+
+    def do(self,board,unit):
+        board.current_unit = unit
+        for p in unit.get_pts():
+            if board.grid[p.y][p.x] == 1:
+                board.is_full = True
+                break
+
+    def undo(self,board):
+        board.is_full = False
+
+
 class NewUnitAction(Action):
     def __init__(self):
         self.unit=None
