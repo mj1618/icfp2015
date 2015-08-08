@@ -1,6 +1,14 @@
 #!/usr/bin/env python
-from point import *
 import copy
+
+from point import *
+from render import *
+
+UNIT_EMPTY = u" "
+UNIT_UNIT = u"U"
+UNIT_PIVOT = u"¨"
+UNIT_UNIT_PIVOT = u"Ü"
+
 class Command:
     pass
 
@@ -78,3 +86,31 @@ class Unit:
         return min(self.row(0), key=lambda pt: pt.x)
     def top_right_pt(self):
         return max(self.row(0), key=lambda pt: pt.x)
+
+    def __str__(self):
+        bbox = [0, 0, 0, 0]
+        points = []
+        for m in self.mask:
+            p = Pt(0, 0).move(m)
+            points.append(p)
+
+            bbox[0] = min(bbox[0], p.x)
+            bbox[1] = min(bbox[1], p.y)
+            bbox[2] = max(bbox[2], p.x)
+            bbox[3] = max(bbox[3], p.y)
+        offset = Pt(bbox[0], bbox[1])
+        dims = Pt(bbox[2]+1, bbox[3]+1) - offset
+        print((offset, dims)) 
+        grid = [[0 for x in range(dims.x)] for y in range(dims.y)]
+        for p in points:
+            p_abs = p-offset
+            print((p, p_abs))
+            grid[p_abs.y][p_abs.x] = 1
+        grid[-offset.y][-offset.x] |= 2
+
+        def query_func(y, x):
+            choices = (UNIT_EMPTY, UNIT_UNIT, UNIT_PIVOT, UNIT_UNIT_PIVOT)
+            return choices[grid[y][x]]
+
+        return render_grid(dims.x, dims.y, query_func)
+
