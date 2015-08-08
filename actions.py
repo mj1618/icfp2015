@@ -121,19 +121,16 @@ class Power(Action):
         return "PowerAction(%s)" % self.word
 
 """Only used for testing to put units in different places"""
-class SetUnitAction(Action):
+class TestPlaceUnitAction(Action):
     def __init__(self,unit):
         self.unit=copy.deepcopy(unit)
 
     def do(self,board):
-        board.current_unit = self.unit
-        for p in self.unit.get_pts():
-            if board.grid[p.y][p.x] == 1:
-                board.is_full = True
-                break
+        for pt in board.current_unit.get_pts():
+            board.grid[pt.y][pt.x] = 1
 
     def undo(self,board):
-        board.is_full = False
+        pass
 
 
 class NewUnitAction(Action):
