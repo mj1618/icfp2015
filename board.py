@@ -36,6 +36,7 @@ class Board:
         self.current_unit = None
         self.current_lines_cleared = 0
         self.old_lines_cleared = 0
+        self.word_count = {} #map from power word -> number of times used
         self.score = 0
         self.error = False
         self.is_full = False
