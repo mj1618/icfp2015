@@ -129,7 +129,7 @@ class NewUnitAction(Action):
         r = board.rng_action()
         self.index = r
 
-        board.current_unit = copy.copy(board.units[r])
+        board.current_unit = copy.deepcopy(board.units[r])
 
     def undo(self,board):
         if board.current_unit is not None:
