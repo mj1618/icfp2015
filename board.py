@@ -59,6 +59,7 @@ class Board:
         if self.step_hook is not None:
             self.step_hook(self, False, cmd)
         return current_step
+    
     def action_step(self,action):
         if self.current_unit is None:
             self.next_unit_action()
@@ -244,3 +245,11 @@ class Board:
                 count += self.is_hole(Pt(x,y))
         return count
  
+    def get_max_altitude(self):
+        for i, row in enumerate(self.cells):
+            if any(row):
+                return i
+        return self.height
+
+    def get_cell_count(self):
+        return sum([sum(r) for r in self.cells])
