@@ -110,3 +110,4 @@ if __name__ == "__main__":
     check(Pt(2,3), HexPt(0,0,-2), Pt(3,1))
     check(Pt(2,3), HexPt(0,-1,-2), Pt(3,0))
     check(Pt(2,4), HexPt(1,1,0), Pt(3,5))
+    check(Pt(4,1), NE, Pt(5,0))
