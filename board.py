@@ -18,7 +18,7 @@ BOARD_EMPTY = u" "
 
 class Board:
 
-    solutions = None
+    solutions = []
 
     def __init__(self, width, height, grid, units, seed, step_hook=None):
         assert height == len(grid)
@@ -36,6 +36,7 @@ class Board:
         self.current_unit = None
         self.current_lines_cleared = 0
         self.old_lines_cleared = 0
+        self.word_count = {} #map from power word -> number of times used
         self.score = 0
         self.error = False
         self.is_full = False
@@ -93,6 +94,9 @@ class Board:
             for action in step.actions:
                 if type(action) is CommandAction:
                     solution.append(action.cmd)
+                elif type(action) is Power:
+                    solution.append(action)
+        self.solutions.append(solution)
 
     def next_unit_action(self):
         a = NewUnitAction()

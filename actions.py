@@ -98,6 +98,10 @@ class Power(Action):
                     self.undo_last_step(board,step)
                 return False
         board.score+=2*len(self.cmds)
+        count = board.word_count.get(self.word, 0)
+        if count == 1:
+            board.score += 300 #bonus for using power word a second time
+        board.word_count[self.word] = count + 1
         self.completed=True
         return True
 
@@ -106,6 +110,10 @@ class Power(Action):
             for cmd in self.cmds:
                 board.undo_last_step()
             board.score-=2*len(self.cmds)
+            count = board.word_count[self.word]
+            if count == 2:
+                board.score -= 300
+            board.word_count[self.word] = count - 1
 
 
 class NewUnitAction(Action):
