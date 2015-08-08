@@ -95,7 +95,7 @@ class Power(Action):
         for cmd in self.cmds:
             board.step(cmd)
             self.steps.append(board.steps.pop())
-            if board.error or (board.is_lock() and self.cmds.index(cmd) < len(self.cmds)-1):
+            if board.error:
                 for step in reversed(self.steps):
                     self.undo_last_step(board,step)
                 return False

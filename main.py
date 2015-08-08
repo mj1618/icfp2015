@@ -12,7 +12,8 @@ from words import *
 from basic_algorithm import *
 from replay_algorithm import *
 # import pdb
-
+import sys
+import codecs
 def replay_test():
     prob = loader.get_qualifier_problems(6)[0]
     board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=0)
@@ -53,6 +54,8 @@ def animate(delay=0.1):
     return show_frame
 
 def main(args):
+
+
     probs = loader.get_qualifier_problems(args.p)
     
     test_prob = probs[0]
