@@ -251,7 +251,7 @@ class Board:
         br = _fetch(point.move(SE))
         
         hole = 0
-        hole |= (l and r) or (tl and br) or (bl and tr)
+        #hole |= (l and r) or (tl and br) or (bl and tr)
         hole |= (l and tr and br) or (r and tl and bl)
         #if hole:
         #    print("{},{},{},{},{},{} = {}".format(l, tl, tr, r, br, bl, hole))
@@ -270,13 +270,19 @@ class Board:
                     holes.add(point)
         return holes
  
-    def get_max_altitude(self):
-        for i, row in enumerate(self.cells):
+    def get_max_altitude(self, include_unit=False):
+
+        alt = self.height
+        for i, row in enumerate(self.grid):
             if any(row):
-                return i
-        return self.height
+                alt = i
+        if include_unit:
+            for pt in self.current_unit.get_pts():
+                if pt.y < alt:
+                    alt = pt.y
+        return self.height-alt
 
     def get_cell_count(self):
-        return sum([sum(r) for r in self.cells])
+        return sum([sum(r) for r in self.grid])
 
 

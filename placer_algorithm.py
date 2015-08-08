@@ -2,6 +2,7 @@
 import copy
 import os
 
+from actions import *
 from point import *
 from unit import *
 
@@ -25,6 +26,8 @@ class PlacerAlgorithm:
             self.step()
             input("Press enter to contiue")
             os.system("clear")
+
+        
 
     def step(self):
         heightmap = self.board.get_base_heightmap()
@@ -65,9 +68,11 @@ class PlacerAlgorithm:
             # score the board
 
             holes = self.board.get_holes(include_unit=True)
-            score = len(holes)*20
+            max_alt = self.board.get_max_altitude(include_unit=True)
+            roughness = sum([heightmap[i-1]-heightmap[i] for i in range(len(heightmap)-1) ])
+            score = len(holes)*20 + max_alt*1 + roughness*1
     
-            print("{} => Score {} (Hole count: {})".format(p, score, holes))
+            print("{} => Score {} (Hole count: {}, Max altitude: {}, Roughness: {})".format(p, score, holes, max_alt, roughness))
             print(self.board)
 
             # record the score, undo placement
@@ -80,7 +85,11 @@ class PlacerAlgorithm:
         unit.pivot = score_table[0][1]
         print(self.board)
         # dummy advance to get a new unit
-        self.board.step(Move(SE))
+        for pt in self.board.current_unit.get_pts():
+            self.board.grid[pt.y][pt.x] = 1
+
+        r = self.board.rng_action()
+        self.board.current_unit = copy.deepcopy(self.board.units[r])
         
 
 
