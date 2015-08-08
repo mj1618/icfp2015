@@ -11,6 +11,8 @@ RNG_TRUNC = 16
 
 BOARD_FILL = u"#"
 BOARD_UNIT = u"U"
+BOARD_PIVOT = u"¨"
+BOARD_UNIT_PIVOT = u"Ü"
 BOARD_EMPTY = u" "
 
 
@@ -114,8 +116,15 @@ class Board:
         assert (x >= 0) and (x < self.width)
         if self.grid[y][x]:
             return BOARD_FILL
-        elif (self.current_unit is not None and self.current_unit.is_filled(y,x)):
-            return BOARD_UNIT
+        elif self.current_unit is not None:
+            fill = self.current_unit.is_filled(y, x)
+            pivot = self.current_unit.pivot == Pt(x, y)
+            if fill and pivot:
+                return BOARD_UNIT_PIVOT
+            elif fill:
+                return BOARD_UNIT
+            elif pivot:
+                return BOARD_PIVOT
         return BOARD_EMPTY
 
 

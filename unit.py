@@ -37,7 +37,7 @@ class Unit:
     def __init__(self, pts, pivot, board_width):
         l, r, t, b = bounds(pts)
         col0 = (board_width - (r - l + 1)) // 2
-        offset = Pt(l - col0, -t)
+        offset = Pt(col0 - l, -t)
         self.pivot = pivot + offset
         self.mask = [(pt + offset).delta(self.pivot) for pt in pts]
         self.old_states = []
