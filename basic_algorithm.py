@@ -34,16 +34,19 @@ class BasicAlgorithm:
         pws = PowerWords()
         success = False
         for w in pws.words:
-            step = self.board.action_step(Power(w,pws.decode(w)))
+            pw=Power(w,pws.decode(w))
+            step = self.board.action_step(pw)
             if self.board.is_complete():
                 return
             elif self.board.error:
                 self.board.undo_last_step()
-            else:
+            elif pw.completed:
                 success=True
                 break
         if not success:
-            for cmd in random.shuffle([Move(E),Move(SE),Move(SW),Move(W)]):
+            ms = [Move(E),Move(SE),Move(SW),Move(W)]
+            random.shuffle(ms)
+            for cmd in ms:
                 step = self.board.step(cmd)
                 if self.board.is_complete():
                     return

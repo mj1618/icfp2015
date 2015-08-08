@@ -114,6 +114,9 @@ class NewUnitAction(Action):
         self.index = 0
     def do(self,board):
 
+        self.unit = board.current_unit
+
+
         if board.current_unit != None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
@@ -124,8 +127,8 @@ class NewUnitAction(Action):
             return
 
         r = board.rng_action()
-        self.unit = copy.deepcopy(board.current_unit)
         self.index = r
+
         board.current_unit = board.units[r]
         board.units.pop(r)
 
