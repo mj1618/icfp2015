@@ -7,7 +7,7 @@ import copy
 from actions import *
 from random import randint
 from unit import *
-
+from basic_algorithm import *
 class PathFinder:
     def __init__(self,board,unit_start,unit_end):
         self.board=copy.deepcopy(board)
@@ -73,6 +73,12 @@ class PathFinder:
                     print(res)
                     print(self.board)
                     input("PathFinder: No commands left to try...")
+
+                    ba = BasicAlgorithm(self.board)
+                    source = self.board.sources_remaining
+                    while source == self.board.sources_remaining:
+                        ba.step()
+                    break
             # input("PathFinder: Press enter to continue")
 
         res=""
