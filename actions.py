@@ -2,7 +2,7 @@
 from render import *
 from point import *
 import copy
-from actions import *
+import logger
 
 RNG_MOD = 2**32
 RNG_MULT = 1103515245
@@ -24,31 +24,77 @@ class Step:
                 return action.cmd
 
 class Action:
-    pass
+    # helper method for performing subactions
+    def subaction(self,action,board):
+        action.do(board)
+        self.subactions.append(action)
 
-class CommandAction(Action):
-    def __init__(self,cmd,lock):
-        self.cmd=cmd
-        self.lock=lock
+    # subclass needs to manually invoke
+    def subundo(self,board):
+        for act in reversed(self.subactions):
+            act.undo(board)
+
     def do(self,board):
-        board.current_unit.command(self.cmd)
+        if logger.active:
+            logger.msg("DO: " + str(self))
+        result = self._do(board)
+        self._done(board)
+        return result
     def undo(self,board):
-        if not self.lock:
-            board.current_unit.undo(self.cmd)
-    def __str__(self):
-        return str(self.cmd)+str(self.lock)
+        if logger.active:
+            logger.msg("UNDO: " + str(self))
+        result = self._undo(board)
+        self._undone(board)
+        return result
+    def _done(self,board):
+        pass
+    def _undone(self,board):
+        pass
 
-class RowAction(Action):
+# BoardAction sends the current board state to the logger after each do/undo
+class BoardAction(Action):
+    def _done(self,board):
+        if logger.active:
+            logger.board(board)
+    def _undone(self,board):
+        if logger.active:
+            logger.board(board)
+
+class CommandAction(BoardAction):
+    def __init__(self,cmd):
+        self.subactions=[]
+        self.cmd=cmd
+        self.lock=False
+    def _do(self,board):
+        board.current_unit.command(self.cmd)
+        board.error = board.current_unit.is_error()
+        if not board.error:
+            self.lock = board.is_lock()
+            if self.lock:
+                board.current_unit.undo(self.cmd)
+                self.subaction(NewUnitAction(), board)
+        board.moves += 1
+    def _undo(self,board):
+        board.moves -= 1
+        if self.lock:
+            self.subundo(board)
+        else:
+            board.current_unit.undo(self.cmd)
+        board.error = False
+    def __str__(self):
+        return str(self.cmd)
+
+class RowAction(BoardAction):
     def __init__(self,y):
         self.y=y
-    def do(self,board):
+    def _do(self,board):
         for x in range(0,board.width):
             board.grid[0][x] = 0
         for y in range(self.y, 0, -1):
             for x in range(0,board.width):
                 board.grid[y][x]=board.grid[y-1][x]
 
-    def undo(self,board):
+    def _undo(self,board):
         for y in range(1,self.y):
             for x in range(0,board.width):
                 board.grid[y-1][x]=board.grid[y][x]
@@ -58,9 +104,9 @@ class RowAction(Action):
 class ScoreAction(Action):
     def __init__(self,amount):
         self.amount=amount
-    def do(self,board):
+    def _do(self,board):
         board.score+=self.amount
-    def undo(self,board):
+    def _undo(self,board):
         board.score-=self.amount
 
 
@@ -70,37 +116,30 @@ class RngAction(Action):
         self.seed = None
         self.old_seed = None
 
-    def do(self,board):
+    def _do(self,board):
         self.old_seed = board.old_seed
         self.seed=board.seed
         board.old_seed = board.seed
         board.seed = ((RNG_MULT*board.seed+RNG_INC) % RNG_MOD)
         return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
-    def undo(self,board):
+    def _undo(self,board):
         board.seed=self.seed
         board.old_seed=self.old_seed
         # return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
 class Power(Action):
     def __init__(self,word,cmds):
+        self.subactions=[]
         self.cmds=cmds
         self.word=word
         self.completed = False
-        self.steps=[]
 
-    def undo_last_step(self,board,step):
-        board.error=False
-        board.is_full = False
-        for action in step.actions:
-            action.undo(board)
-    def do(self,board):
+    def _do(self,board):
         for cmd in self.cmds:
-            board.step(cmd)
-            self.steps.append(board.steps.pop())
+            self.subaction(CommandAction(cmd), board)
             if board.error:
-                for step in reversed(self.steps):
-                    self.undo_last_step(board,step)
+                self.subundo(board)
                 return False
         board.score+=2*len(self.cmds)
         count = board.word_count.get(self.word, 0)
@@ -110,15 +149,22 @@ class Power(Action):
         self.completed=True
         return True
 
-    def undo(self,board):
+    def _done(self, board):
+        if logger.active:
+            result = "DONE" if self.completed else "CANCELLED"
+            logger.msg(result + ": invoking phrase of power: " + self.word)
+
+    def _undo(self,board):
         if self.completed:
-            for cmd in self.cmds:
-                board.undo_last_step()
+            self.subundo(board)
             board.score-=2*len(self.cmds)
             count = board.word_count[self.word]
             if count == 2:
                 board.score -= 300
             board.word_count[self.word] = count - 1
+    def _undone(self, board):
+        if logger.active:
+            logger.msg("UNDONE: revoked phrase of power: " + self.word)
 
     def __repr__(self):
         return "PowerAction(%s)" % self.word
@@ -132,12 +178,7 @@ class NewUnitAction(Action):
         self.subactions = []
         self.saved_old_lines = 0
 
-    def subaction(self, action, board):
-        action.do(board)
-        self.subactions.append(action)
-
-    def do(self,board):
-
+    def _do(self,board):
         self.unit = board.current_unit
         self.saved_old_lines = board.old_lines_cleared
 
@@ -175,12 +216,11 @@ class NewUnitAction(Action):
                 break
 
 
-    def undo(self,board):
+    def _undo(self,board):
         if self.unit is not None:
             for pt in self.unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
-        for subaction in reversed(self.subactions):
-            subaction.undo(board)
+        self.subundo(board)
         board.is_full = False
         if board.current_unit is not None:
             board.sources_remaining+=1

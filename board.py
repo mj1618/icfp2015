@@ -41,6 +41,7 @@ class Board:
         self.error = False
         self.is_full = False
         self.step_hook = step_hook
+        self.moves = 0
 
         self.step()
 
@@ -116,16 +117,9 @@ class Board:
 
     """ returns True if successful, False if an error move occurred. State is left in Error """
     def command(self, cmd):
-        self.current_unit.command(cmd)
-        lock = False
-        self.error = self.current_unit.is_error()
-        if not self.error:
-            lock = self.is_lock()
-            if lock:
-                self.current_unit.undo(cmd)
-                self.next_unit_action()
-        self.current_actions.append(CommandAction(cmd,lock))
-
+        act = CommandAction(cmd)
+        self.current_actions.append(act)
+        act.do(self)
 
     def is_cell_valid(self, point):
         return not ((point.x < 0) or (point.x >= self.width) or (point.y < 0) or (point.y >= self.height))
@@ -164,8 +158,10 @@ class Board:
 
 
     def __str__(self):
-        return render_grid(self.width, self.height, self.query_cell)
-
+        grid = render_grid(self.width, self.height, self.query_cell)
+        err = "ERROR" if self.error else ""
+        status = " %5s   Score: %d   Moves: %d" % (err, self.score, self.moves)
+        return grid + status
 
     def get_base_heightmap(self):
         heightmap = [0 for i in range(self.width)]
