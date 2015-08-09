@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from render import *
 from point import *
-import words
 import copy
 import logger
 
@@ -132,17 +131,16 @@ class RngAction(Action):
 class Power(Action):
     def __init__(self,word):
         self.subactions=[]
-        self.cmds=words.decode_word(word)
         self.word=word
         self.completed = False
 
     def _do(self,board):
-        for cmd in self.cmds:
+        for cmd in self.word.cmds:
             self.subaction(CommandAction(cmd), board)
             if board.error:
                 self.subundo(board)
                 return False
-        board.score+=2*len(self.cmds)
+        board.score+=2*len(self.word)
         count = board.word_count.get(self.word, 0)
         if count == 1:
             board.score += 300 #bonus for using power word a second time
@@ -153,19 +151,19 @@ class Power(Action):
     def _done(self, board):
         if logger.active:
             result = "DONE" if self.completed else "CANCELLED"
-            logger.msg(result + ": invoking phrase of power: " + self.word)
+            logger.msg(result + ": invoking phrase of power: " + str(self.word))
 
     def _undo(self,board):
         if self.completed:
             self.subundo(board)
-            board.score-=2*len(self.cmds)
+            board.score-=2*len(self.word)
             count = board.word_count[self.word]
             if count == 2:
                 board.score -= 300
             board.word_count[self.word] = count - 1
     def _undone(self, board):
         if logger.active:
-            logger.msg("UNDONE: revoked phrase of power: " + self.word)
+            logger.msg("UNDONE: revoked phrase of power: " + str(self.word))
 
     def __repr__(self):
         return "PowerAction(%s)" % self.word

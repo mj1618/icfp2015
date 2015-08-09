@@ -8,6 +8,7 @@ from actions import *
 from random import randint
 from unit import *
 from basic_algorithm import *
+
 class PathFinder:
     def __init__(self,board,unit_start,unit_end,power):
         self.board=board
@@ -45,6 +46,7 @@ class PathFinder:
                 been.append(self.board.current_unit.pivot)
                 sources = self.board.sources_remaining
                 d = self.unit_end.pivot.delta(self.unit_start.pivot)
+
                 cmd = None
                 if d.e > 0 and Move(E) not in tried :
                     cmd = Move(E)
@@ -66,7 +68,6 @@ class PathFinder:
                             break
 
                 if cmd is not None:
-
                     self.board.step(cmd)
                     if self.board.error or self.board.current_unit != self.unit_start or self.board.current_unit.pivot in been:
                         self.board.undo_last_step()

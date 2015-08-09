@@ -2,6 +2,7 @@
 from render import *
 from point import *
 from unit import *
+from words import *
 import copy
 from actions import *
 RNG_MOD = 2**32
@@ -54,10 +55,11 @@ class Board:
             self.next_unit_action()
         elif isinstance(cmd, Command):
             self.command(cmd)
-        elif isinstance(cmd, str):
+        elif isinstance(cmd, PowerWord):
             if not self.power_word(cmd):
                 return
-
+        else:
+            raise TypeError(type(cmd))
         current_step = Step(self.current_actions)
         self.steps.append(current_step)
         self.current_actions=[]
