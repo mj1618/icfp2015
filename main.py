@@ -44,10 +44,13 @@ def display(board, is_undo, cmd):
     print("   Score:", board.score)
     print("")
 
-def run_all():
+def run_problem(p):
+    run_problems(p,p+1)
+
+def run_problems(start,end):
 
     submit_data = []
-    for p in range(0,25):
+    for p in range(start,end):
         print("Problem %d"%p)
         probs = loader.get_qualifier_problems(p)
         test_prob = probs[0]
@@ -55,8 +58,7 @@ def run_all():
 
             test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=seed,sources_length=test_prob["sourceLength"])
 
-
-            algo = BasicAlgorithm(test_board, step_hook=None)
+            algo = PfpAlgorithm(test_board, step_hook=None)
             algo.start()
 
             print("%d"%test_board.score)
@@ -68,6 +70,9 @@ def run_all():
             })
 
     loader.submit(submit_data)
+
+def run_all():
+    run_problems(0,25)
 
 class Animator:
     def __init__(self, delay=0.1):
@@ -120,7 +125,7 @@ def main(args):
 
     submit_data = []
 
-    algo = PfpAlgorithm(test_board, step_hook=hook)
+    algo = PfpAlgorithm(test_board, step_hook=None)
     algo.start()
 
 
@@ -156,6 +161,7 @@ actgroup = opts.add_mutually_exclusive_group()
 actgroup.add_argument("-r", help="run replay test", action="store_true")
 actgroup.add_argument("-pf", help="run path finder test", action="store_true")
 opts.add_argument("-p", type=int, help="select a qualifying problem", default=1)
+opts.add_argument("-runp", type=int, help="select a qualifying problem and submit solution", default=1)
 opts.add_argument("-all", help="run through and submit all problems", action="store_true")
 opts.add_argument("-s", help="submit solution to the specified problem", action="count")
 
@@ -168,5 +174,7 @@ if __name__ == "__main__":
         path_finder_test()
     elif args.all:
         run_all()
+    elif args.runp:
+        run_problem(args.runp)
     else:
         main(args)
