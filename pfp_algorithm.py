@@ -34,7 +34,6 @@ class PfpAlgorithm:
         pf = PathFinder(self.board, self.board.current_unit, unit)
         for cmd in pf.find_path():
            if cmd is not None:
-               self.board.step(cmd)
                self.cmds.append(cmd)
 
         # input("PFP: Press enter to continue")

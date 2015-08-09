@@ -67,8 +67,8 @@ class BasicAlgorithm:
             elif ms.index(cmd)==3:
                 success=True
                 break
-            elif sources != self.board.sources_remaining:
-                self.board.undo_last_step()
+            # elif sources != self.board.sources_remaining:
+            #     self.board.undo_last_step()
             else:
                 success=True
                 break

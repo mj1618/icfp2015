@@ -10,10 +10,12 @@ from unit import *
 from basic_algorithm import *
 class PathFinder:
     def __init__(self,board,unit_start,unit_end):
-        self.board=copy.deepcopy(board)
-        self.unit_start = copy.deepcopy(unit_start)
-        self.unit_end = copy.deepcopy(unit_end)
-        self.actions = []
+        self.board=board
+        self.unit_start = unit_start
+        self.unit_end = unit_end
+        self.steps = []
+
+
 
     def complete(self):
         return self.unit_start == self.unit_end
@@ -27,12 +29,13 @@ class PathFinder:
     def find_path(self):
 
         ms = [Move(E),Move(SE),Move(SW),Move(W)]
+        source = self.board.sources_remaining
+        original_steps = len(self.board.steps)
 
         if self.unit_end is None:
             self.finish_unit_basic()
         else:
             self.board.current_unit = self.unit_start
-            self.board.steps = []
             tried = []
             try_history = []
             been = []
@@ -74,7 +77,7 @@ class PathFinder:
                         try_history.append(tried)
                         tried = []
                 else:
-                    if len(self.board.steps)>0:
+                    if len(try_history)>0:
                         self.board.undo_last_step()
                         tried = try_history.pop()
                     else:
@@ -89,20 +92,16 @@ class PathFinder:
                         break
                 # input("PathFinder: Press enter to continue")
 
-        res=""
-        cmds = []
-        for step in self.board.steps:
-            res+=str(step.command())
-            cmds.append(step.command())
 
-        source = self.board.sources_remaining
-        for cmd in ms:
-            self.board.step(cmd)
-            if source == self.board.sources_remaining:
-                self.board.undo_last_step()
-            else:
-                cmds.append(cmd)
-                break
+        if source==self.board.sources_remaining:
+            for cmd in ms:
+                self.board.step(cmd)
+                if source == self.board.sources_remaining:
+                    self.board.undo_last_step()
+                else:
+                    break
 
-        print(res)
+        cmds=[]
+        for i in range(original_steps, len(self.board.steps)):
+            cmds.append(self.board.steps[i].command())
         return cmds
