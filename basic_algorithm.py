@@ -14,6 +14,7 @@ class BasicAlgorithm:
         self.i = 0
         if step_hook is not None:
             board.install_step_hook(step_hook)
+        random.seed(0)
 
 
     def start(self):
@@ -52,6 +53,8 @@ class BasicAlgorithm:
 
         # if not success:
         ms = [Move(SE),Move(SW),Move(W),Move(E)]
+        random.shuffle(ms)
+
         for cmd in ms:
             sources = self.board.sources_remaining
             # print("sources before: %d"%sources)
