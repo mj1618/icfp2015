@@ -16,6 +16,7 @@ from placer_algorithm import *
 import sys
 import codecs
 from path_finder import *
+from pfp_algorithm import *
 
 def replay_test(args):
     prob = loader.get_qualifier_problems(args.p)[0]
@@ -119,7 +120,7 @@ def main(args):
 
     submit_data = []
 
-    algo = BasicAlgorithm(test_board, step_hook=hook)
+    algo = PfpAlgorithm(test_board, step_hook=hook)
     algo.start()
 
 

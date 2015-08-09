@@ -15,10 +15,10 @@ class Nothing(Move):
 
 class PlacerAlgorithm:
     def __init__(self, board, step_hook=None):
-        self.board = board
+        self.board = copy.deepcopy(board)
         
         if step_hook is not None:
-            board.install_step_hook(step_hook)
+            self.board.install_step_hook(step_hook)
 
 
     def start(self):
@@ -87,9 +87,10 @@ class PlacerAlgorithm:
         # dummy advance to get a new unit
         for pt in self.board.current_unit.get_pts():
             self.board.grid[pt.y][pt.x] = 1
+        #
+        # r = self.board.rng_action()
+        # self.board.current_unit = copy.deepcopy(self.board.units[r])
 
-        r = self.board.rng_action()
-        self.board.current_unit = copy.deepcopy(self.board.units[r])
-        
+        return self.board.current_unit
 
 

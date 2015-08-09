@@ -7,11 +7,12 @@ import copy
 from actions import *
 from random import randint
 from unit import *
+
 class PathFinder:
     def __init__(self,board,unit_start,unit_end):
         self.board=copy.deepcopy(board)
-        self.unit_start = unit_start
-        self.unit_end = unit_end
+        self.unit_start = copy.deepcopy(unit_start)
+        self.unit_end = copy.deepcopy(unit_end)
         self.actions = []
 
     def complete(self):
@@ -22,6 +23,9 @@ class PathFinder:
 
         last_tried = None
 
+        while not self.board.current_unit.rotation_matches(self.unit_end.current_rotation):
+            self.board.step(Rotation(Clockwise))
+
         ms = [Move(E),Move(SE),Move(SW),Move(W)]
         while not self.complete():
             sources = self.board.sources_remaining
@@ -29,22 +33,22 @@ class PathFinder:
             cmd = None
             if d.e > 0 and last_tried is None :
                 cmd = Move(E)
-            elif d.e < 0 and ms.index(last_tried)<1:
-                cmd = Move(W)
-            elif d.se > 0 and ms.index(last_tried)<2:
+            elif d.se > 0 and (last_tried is None or ms.index(last_tried)<1):
                 cmd = Move(SE)
-            elif d.sw > 0 and ms.index(last_tried)<3:
+            elif d.sw > 0 and (last_tried is None or ms.index(last_tried)<2):
                 cmd = Move(SW)
+            elif d.e < 0 and (last_tried is None or ms.index(last_tried)<3):
+                cmd = Move(W)
 
             if cmd is None:
                 if last_tried is None :
                     cmd = Move(E)
-                elif ms.index(last_tried)<1:
-                    cmd = Move(W)
-                elif ms.index(last_tried)<2:
+                elif last_tried is None or ms.index(last_tried)<1:
                     cmd = Move(SE)
-                elif ms.index(last_tried)<3:
+                elif last_tried is None or ms.index(last_tried)<2:
                     cmd = Move(SW)
+                elif last_tried is None or ms.index(last_tried)<3:
+                    cmd = Move(W)
 
 
             if cmd is not None:
@@ -57,7 +61,10 @@ class PathFinder:
                 last_tried = self.board.undo_last_step().command()
 
         res=""
+        cmds = []
         for step in self.board.steps:
             res+=str(step.command())
+            cmds.append(step.command())
 
         print(res)
+        return cmds
