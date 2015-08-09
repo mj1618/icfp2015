@@ -224,10 +224,10 @@ class NewUnitAction(Action):
 
 
     def _undo(self,board):
+        self.subundo(board)
         if self.unit is not None:
             for pt in self.unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
-        self.subundo(board)
         board.is_full = False
         if board.current_unit is not None:
             board.sources_remaining+=1
