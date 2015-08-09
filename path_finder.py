@@ -46,28 +46,33 @@ class PathFinder:
                 sources = self.board.sources_remaining
                 d = self.unit_end.pivot.delta(self.unit_start.pivot)
                 cmd = None
-                if d.e > 0 and Move(E) not in tried :
-                    cmd = Move(E)
-                elif d.se > 0 and Move(SE) not in tried:
-                    cmd = Move(SE)
-                elif d.sw > 0 and Move(SW) not in tried:
-                    cmd = Move(SW)
-                elif d.e < 0 and Move(W) not in tried:
-                    cmd = Move(W)
+
+                for w in KnownWords.words:
+                    if w not in tried:
+                        cmd = Power(w,KnownWords.decode(w))
+                        tried.append(w)
+                        break
+                if cmd is None:
+                    if d.e > 0 and Move(E) not in tried :
+                        cmd = Move(E)
+                    elif d.se > 0 and Move(SE) not in tried:
+                        cmd = Move(SE)
+                    elif d.sw > 0 and Move(SW) not in tried:
+                        cmd = Move(SW)
+                    elif d.e < 0 and Move(W) not in tried:
+                        cmd = Move(W)
 
                 if cmd is None:
-                    # for w in KnownWords.words:
-                    #     if w not in tried:
-                    #         cmd = w
-                    #         break
                     for m in ms:
                         if m not in tried:
                             cmd = m
                             break
 
                 if cmd is not None:
-
-                    self.board.step(cmd)
+                    if type(cmd) is Power:
+                        self.board.power_step(cmd)
+                    else:
+                        self.board.step(cmd)
                     if self.board.error or self.board.current_unit != self.unit_start or self.board.current_unit.pivot in been:
                         self.board.undo_last_step()
                         tried.append(cmd)
@@ -94,7 +99,12 @@ class PathFinder:
         if self.board.current_unit == self.unit_start:
             # lock the piece by crashing into a neighbouring cell
             for cmd in ms:
-                self.board.step(cmd)
+
+                if type(cmd) is Power:
+                    self.board.power_step(cmd)
+                else:
+                    self.board.step(cmd)
+
                 if self.board.current_unit == self.unit_start:
                     self.board.undo_last_step()
                 else:
