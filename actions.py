@@ -95,7 +95,7 @@ class CommandAction(BoardAction):
         else:
             board.current_unit.undo(self.cmd)
         board.error = False
-    def __str__(self):
+    def __repr__(self):
         return str(self.cmd)
 
 class RowAction(BoardAction):
@@ -109,12 +109,12 @@ class RowAction(BoardAction):
                 board.grid[y][x]=board.grid[y-1][x]
 
     def _undo(self,board):
-        for y in range(1,self.y):
+        for y in range(1,self.y + 1):
             for x in range(0,board.width):
                 board.grid[y-1][x]=board.grid[y][x]
         for x in range(0,board.width):
             board.grid[self.y][x] = 1
-    def __str__(self):
+    def __repr__(self):
         return "ClearRow(%d)" % self.y
 
 class ScoreAction(Action):
@@ -124,6 +124,8 @@ class ScoreAction(Action):
         board.score+=self.amount
     def _undo(self,board):
         board.score-=self.amount
+    def __repr__(self):
+        return "Score(+%d)" % self.amount
 
 
 class RngAction(Action):
