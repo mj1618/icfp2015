@@ -2,6 +2,7 @@
 import os
 import time
 
+from actions import *
 from words import command
 
 def char_stream(stream):
