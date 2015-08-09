@@ -22,12 +22,14 @@ class PathFinder:
         self.board.current_unit = self.unit_start
         self.board.steps = []
         last_tried = None
+        been = []
 
         while not self.board.current_unit.rotation_matches(self.unit_end.current_rotation):
             self.board.step(Rotation(Clockwise))
 
         ms = [Move(E),Move(SE),Move(SW),Move(W)]
         while not self.complete():
+            been.append(self.board.current_unit.pivot)
             sources = self.board.sources_remaining
             d = self.unit_end.pivot.delta(self.unit_start.pivot)
             cmd = None
@@ -53,19 +55,31 @@ class PathFinder:
 
             if cmd is not None:
                 self.board.step(cmd)
-                if self.board.error or sources != self.board.sources_remaining:
+                if self.board.error or sources != self.board.sources_remaining or self.board.current_unit.pivot in been:
                     last_tried = self.board.undo_last_step().command()
                 else:
                     last_tried = None
             else:
-                last_tried = self.board.undo_last_step().command()
-            input("PathFinder: Press enter to continue")
+                if len(self.board.steps)>0:
+                    last_tried = self.board.undo_last_step().command()
+                else:
+                    pass
+            # input("PathFinder: Press enter to continue")
 
         res=""
         cmds = []
         for step in self.board.steps:
             res+=str(step.command())
             cmds.append(step.command())
+
+        source = self.board.sources_remaining
+        for cmd in ms:
+            self.board.step(cmd)
+            if source == self.board.sources_remaining:
+                self.board.undo_last_step()
+            else:
+                cmds.append(cmd)
+                break
 
         print(res)
         return cmds
