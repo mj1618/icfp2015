@@ -159,9 +159,11 @@ class Board:
 
     def __str__(self):
         grid = render_grid(self.width, self.height, self.query_cell)
-        err = "ERROR" if self.error else ""
-        status = " %5s   Score: %d   Moves: %d" % (err, self.score, self.moves)
-        return grid + status
+        status = ""
+        if self.error: status="ERROR"
+        elif self.is_complete(): status="DONE"
+        detail = " %5s   Score: %d   Moves: %d   Remain: %d" % (status, self.score, self.moves, self.sources_remaining)
+        return grid + detail
 
     def get_base_heightmap(self):
         heightmap = [0 for i in range(self.width)]
