@@ -4,21 +4,30 @@ import json
 import urllib.request
 import urllib.parse
 import ssl
+import os.path
 from point import Pt
 from unit import Unit
 import base64
 
 QUALIFIER_PROBLEM_URL = "http://icfpcontest.org/problems/problem_{}.json"
+LOCAL_PATH = "qualifiers/{}.json"
+
+def get_problem_data(i):
+    local = LOCAL_PATH.format(i)
+    if os.path.exists(local):
+        print("Loading qualifier {} from local cache...".format(i))
+        with open(local) as f:
+            return f.read()
+    url = QUALIFIER_PROBLEM_URL.format(i)
+    print("Loading {}...".format(url))
+    return urllib.request.urlopen(url).read().decode("utf8")
 
 def get_qualifier_problems(*args):
     if len(args) == 0:
         args = range(24)
     problem_data = []
     for i in args:
-        url = QUALIFIER_PROBLEM_URL.format(i)
-        print("Loading {}...".format(url))
-        data = urllib.request.urlopen(url).read().decode("utf8")
-        problem_data.append(loader(data))
+        problem_data.append(loader(get_problem_data(i)))
 
     return problem_data
 

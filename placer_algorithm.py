@@ -14,6 +14,9 @@ class Nothing(Move):
         super(Nothing, self).__init__(HexPt(0, 0, 0))
 
 class PlacerAlgorithm:
+
+    test = False
+
     def __init__(self, board, step_hook=None):
         self.board = copy.deepcopy(board)
         
@@ -33,18 +36,18 @@ class PlacerAlgorithm:
         heightmap = self.board.get_base_heightmap()
         #unit = copy.deepcopy(self.board.current_unit)
         old_holes = self.board.get_holes()
-        print("Heightmap: {}".format(heightmap))
-        print("Old hole count: {}".format(old_holes))
+        if self.test: print("Heightmap: {}".format(heightmap))
+        if self.test: print("Old hole count: {}".format(old_holes))
 
         unit= self.board.current_unit
-        print(unit)
+        if self.test: print(unit)
         points = unit.get_pts()
 
         candidate_surfaces = set()
         for p in points:
             if (p.move(SW) not in points) or (p.move(SE) not in points):
                 delta = p.delta(unit.pivot)
-                print((p, delta))
+                if self.test: print((p, delta))
                 candidate_surfaces.add(-delta)
 
         candidate_pivots = set()
@@ -80,8 +83,8 @@ class PlacerAlgorithm:
 
             score = len(holes)*20 + max_alt*1 #+ sum(line_bonus)
     
-            print("{} => Score {} (Hole count: {}, Max altitude: {}, Line Bonus: {})".format(p, score, holes, max_alt, line_bonus))
-            #print(self.board)
+            if self.test: print("{} => Score {} (Hole count: {}, Max altitude: {}, Line Bonus: {})".format(p, score, holes, max_alt, line_bonus))
+            if self.test: print(self.board)
 
             # record the score, undo placement
             score_table.append((score, p))
@@ -89,9 +92,9 @@ class PlacerAlgorithm:
         score_table.sort(key=lambda x: x[0])
 
         # carry out best move
-        print("WINNER: {}".format(score_table[0]))
+        if self.test: print("WINNER: {}".format(score_table[0]))
         unit.pivot = score_table[0][1]
-        print(self.board)
+        if self.test: print(self.board)
         # dummy advance to get a new unit
         for pt in self.board.current_unit.get_pts():
             self.board.grid[pt.y][pt.x] = 1

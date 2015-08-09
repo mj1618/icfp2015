@@ -4,6 +4,7 @@ import time
 
 from pprint import pprint
 import loader
+import logger
 from board import *
 from unit import *
 from point import *
@@ -41,33 +42,46 @@ def path_finder_test():
 def display(board, is_undo, cmd):
     print("%s: %s" % ("UNDO" if is_undo else "DO", str(cmd)))
     print(board)
-    print("   Score:", board.score)
     print("")
 
-def run_all():
+def run_problem(p):
+    run_problems(p,p+1)
+
+def run_problems(start,end):
+
+
+    hook = None
+    if args.v:
+        hook = display
+    elif args.a:
+        hook = animate(args.a/10)
 
     submit_data = []
-    for p in range(0,25):
+    for p in range(start,end):
         print("Problem %d"%p)
         probs = loader.get_qualifier_problems(p)
         test_prob = probs[0]
         for seed in test_prob["sourceSeeds"]:
 
-            test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=seed,sources_length=test_prob["sourceLength"])
+            prob = copy.deepcopy(test_prob)
+            test_board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=seed,sources_length=prob["sourceLength"],step_hook=hook)
 
-
-            algo = BasicAlgorithm(test_board, step_hook=None)
+            algo = PfpAlgorithm(test_board, step_hook=hook)
             algo.start()
 
             print("%d"%test_board.score)
 
             submit_data.append({
-                "problemId": args.p,
+                "problemId": p,
                 "seed": seed,
-                "solution": KnownWords.encode(test_board.solutions[0])
+                "solution": KnownWords.encode(algo.cmds)
             })
 
     loader.submit(submit_data)
+
+
+def run_all():
+    run_problems(0,25)
 
 class Animator:
     def __init__(self, delay=0.1):
@@ -96,10 +110,13 @@ def animate(delay=0.1):
     return show_frame
 
 def main(args):
-
-
     probs = loader.get_qualifier_problems(args.p)
     
+    if args.v:
+        logger.enable(logger.Print())
+    elif args.a:
+        logger.enable(logger.Animate(Animator(args.a/10)))
+
     test_prob = probs[0]
     test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0],sources_length=test_prob["sourceLength"])
     print("loaded")
@@ -111,16 +128,9 @@ def main(args):
     # test_board.step(Rotation(Clockwise))
     # pdb.set_trace()
 
-    hook = None
-    if args.v:
-        hook = display
-    elif args.a:
-        hook = animate(args.a/10)
-
-
     submit_data = []
 
-    algo = PfpAlgorithm(test_board, step_hook=hook)
+    algo = PfpAlgorithm(test_board)
     algo.start()
 
 
@@ -132,7 +142,6 @@ def main(args):
     submit_data.append({
         "problemId": args.p,
         "seed": test_prob["sourceSeeds"][0],
-        "tag": time.strftime("%H:%M:%S"),
         "solution": KnownWords.encode(test_board.solutions[0])
     })
 
@@ -156,6 +165,7 @@ actgroup = opts.add_mutually_exclusive_group()
 actgroup.add_argument("-r", help="run replay test", action="store_true")
 actgroup.add_argument("-pf", help="run path finder test", action="store_true")
 opts.add_argument("-p", type=int, help="select a qualifying problem", default=1)
+opts.add_argument("-runp", type=int, help="select a qualifying problem and submit solution")
 opts.add_argument("-all", help="run through and submit all problems", action="store_true")
 opts.add_argument("-s", help="submit solution to the specified problem", action="count")
 
@@ -168,5 +178,7 @@ if __name__ == "__main__":
         path_finder_test()
     elif args.all:
         run_all()
+    elif args.runp:
+        run_problem(args.runp)
     else:
         main(args)

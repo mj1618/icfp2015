@@ -36,7 +36,6 @@ class BasicAlgorithm:
         pws = KnownWords
         success = False
         self.i += 1
-        random.shuffle(pws.words)
         if self.i%3 ==0:
             for w in pws.words:
                 pw=Power(w,pws.decode(w))
@@ -52,7 +51,7 @@ class BasicAlgorithm:
 
 
         # if not success:
-        ms = [Move(E),Move(SE),Move(SW),Move(W)]
+        ms = [Move(SE),Move(SW),Move(W),Move(E)]
         for cmd in ms:
             sources = self.board.sources_remaining
             # print("sources before: %d"%sources)
@@ -67,8 +66,8 @@ class BasicAlgorithm:
             elif ms.index(cmd)==3:
                 success=True
                 break
-            elif sources != self.board.sources_remaining:
-                self.board.undo_last_step()
+            # elif sources != self.board.sources_remaining:
+            #     self.board.undo_last_step()
             else:
                 success=True
                 break
