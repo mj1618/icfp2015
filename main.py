@@ -135,14 +135,15 @@ def main(args):
 
 
     print(test_board)
-    print(test_board.solutions[0])
-    print(KnownWords.encode(test_board.solutions[0]))
+    solution = test_board.get_solution()
+    print(solution)
+    print(KnownWords.encode(solution))
     print("%d"%test_board.score)
 
     submit_data.append({
         "problemId": args.p,
         "seed": test_prob["sourceSeeds"][0],
-        "solution": KnownWords.encode(test_board.solutions[0])
+        "solution": KnownWords.encode(solution)
     })
 
 

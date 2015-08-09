@@ -20,8 +20,6 @@ BOARD_EMPTY = u" "
 
 class Board:
 
-    solutions = []
-
     def __init__(self, width, height, grid, units, seed, sources_length, step_hook=None):
         assert height == len(grid)
         for row in grid:
@@ -62,8 +60,6 @@ class Board:
         current_step = Step(self.current_actions)
         self.steps.append(current_step)
         self.current_actions=[]
-        if self.is_complete():
-            self.record_solution()
         if self.step_hook is not None:
             self.step_hook(self, False, cmd)
         return current_step
@@ -85,7 +81,8 @@ class Board:
     def is_complete(self):
         return (self.sources_remaining==0 and self.current_unit is None) or self.is_full
 
-    def record_solution(self):
+    # returns the list of commands/power words needed to reach the current state
+    def get_solution(self):
         solution = []
         for step in self.steps:
             for action in step.actions:
@@ -93,7 +90,7 @@ class Board:
                     solution.append(action.cmd)
                 elif type(action) is Power:
                     solution.append(action)
-        self.solutions.append(solution)
+        return solution
 
     def next_unit_action(self):
         a = NewUnitAction()
