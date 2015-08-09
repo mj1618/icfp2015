@@ -56,7 +56,8 @@ def run_problems(start,end):
         test_prob = probs[0]
         for seed in test_prob["sourceSeeds"]:
 
-            test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=seed,sources_length=test_prob["sourceLength"])
+            prob = copy.deepcopy(test_prob)
+            test_board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=seed,sources_length=prob["sourceLength"])
 
             algo = PfpAlgorithm(test_board, step_hook=None)
             algo.start()

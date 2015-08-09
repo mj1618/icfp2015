@@ -52,7 +52,7 @@ class BasicAlgorithm:
 
 
         # if not success:
-        ms = [Move(E),Move(SE),Move(SW),Move(W)]
+        ms = [Move(SE),Move(SW),Move(W),Move(E)]
         for cmd in ms:
             sources = self.board.sources_remaining
             # print("sources before: %d"%sources)
