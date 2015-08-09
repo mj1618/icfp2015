@@ -19,9 +19,23 @@ class Step:
     def __str__(self):
         return "Step" + str([str(a) for a in self.actions])
     def command(self):
+        cmds = []
         for action in self.actions:
             if type(action) is CommandAction:
                 return action.cmd
+        return cmds
+    def commands(self):
+        cmds = []
+        for action in self.actions:
+            if type(action) is CommandAction:
+                cmds.append(action.cmd)
+            elif type(action) is Power:
+                for sa in action.subactions:
+                    if type(sa) is CommandAction:
+                        cmds.append(sa.cmd)
+        return cmds
+
+
 
 class Action:
     # helper method for performing subactions
