@@ -147,9 +147,8 @@ def main(args):
     })
 
 
-    for step in test_board.steps:
-        for action in step.actions:
-            pprint(vars(action))
+    for action in test_board.steps:
+        pprint(vars(action))
     if args.s:
         loader.submit(submit_data)
     #

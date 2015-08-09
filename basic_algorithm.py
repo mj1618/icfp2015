@@ -39,7 +39,7 @@ class BasicAlgorithm:
         self.i += 1
         if self.i%3 ==0:
             for w in pws.words:
-                step = self.board.step(w)
+                step = self.board.step(Power(w))
                 if self.board.is_complete():
                     return
                 elif self.board.error:
@@ -58,7 +58,7 @@ class BasicAlgorithm:
             sources = self.board.sources_remaining
             # print("sources before: %d"%sources)
 
-            step = self.board.step(cmd)
+            step = self.board.step(CommandAction(cmd))
             # print("sources after: %d"%self.board.sources_remaining)
             if self.board.is_complete():
                 print("completing")

@@ -34,16 +34,16 @@ def next_cmd(axes, words, rots, tried):
         for pw in words[dir]:
             if pw not in tried:
                 tried.add(pw)
-                return pw
+                return Power(pw, True)
     for axis in axes:
         dir = axis[1]
         if Move(dir) not in tried:
             tried.add(Move(dir))
-            return Move(dir)
+            return CommandAction(Move(dir))
     for rot in rots:
         if rot not in tried:
             tried.add(rot)
-            return rot
+            return CommandAction(rot)
 
     return None
 
@@ -56,7 +56,7 @@ class PathFinder:
         self.steps = []
         self.lowest_y = 0
         self.checking_lowest = False
-        self.lowest_unit = None
+        self.lowest_unit = copy.deepcopy(self.unit_start)
 
     def complete(self):
         return self.unit_start == self.unit_ends[0] or (self.checking_lowest and self.board.current_unit.pivot.y == self.lowest_y)
@@ -70,7 +70,6 @@ class PathFinder:
     def check_lowest(self):
         if self.checking_lowest is False and self.board.current_unit.pivot.y > self.lowest_y:
             self.lowest_unit = copy.deepcopy(self.unit_ends[0])
-            # self.lowest_unit = copy.deepcopy(self.board.current_unit)
             self.lowest_y = self.lowest_unit.pivot.y
 
     def find_path(self):
@@ -90,7 +89,7 @@ class PathFinder:
             #     self.board.step(Rotation(Clockwise))
 
             while not self.complete():
-                been.add(self.board.current_unit)
+                been.add((self.board.current_unit.pivot,self.board.current_unit.current_rotation))
                 self.check_lowest()
                 d = self.unit_ends[0].pivot.delta(self.unit_start.pivot)
                 axes = axis_sort(d)
@@ -99,7 +98,7 @@ class PathFinder:
 
                 if cmd is not None:
                     self.board.step(cmd)
-                    if self.board.error or self.board.current_unit != self.unit_start or self.board.current_unit in been:
+                    if self.board.error or self.board.current_unit != self.unit_start or (self.board.current_unit.pivot,self.board.current_unit.current_rotation) in been:
                         self.board.undo_last_step()
                     else:
                         try_history.append(tried)
@@ -126,7 +125,6 @@ class PathFinder:
                         self.checking_lowest = True
                         self.unit_ends.pop(0)
                         self.unit_ends.append(copy.deepcopy(self.lowest_unit))
-
                         try_history = []
                         been = set()
                         tried = set()
@@ -142,18 +140,17 @@ class PathFinder:
         if self.board.current_unit == self.unit_start:
             # lock the piece by crashing into a neighbouring cell
             for cmd in ms:
-                self.board.step(cmd)
+                self.board.step(CommandAction(cmd))
                 if self.board.current_unit == self.unit_start:
                     self.board.undo_last_step()
                 else:
                     break
             for rot in rotations:
-                self.board.step(rot)
+                self.board.step(CommandAction(rot))
                 if self.board.current_unit == self.unit_start:
                     self.board.undo_last_step()
                 else:
                     break
-
             if self.board.current_unit == self.unit_start:
                 self.finish_unit_basic()
             if self.board.current_unit == self.unit_start:
@@ -163,5 +160,5 @@ class PathFinder:
 
         # cmds=[]
         # for i in range(original_steps, len(self.board.steps)):
-        #     cmds.append(self.board.steps[i].command())
+        #     cmds.append(self.board.steps[i])
         # return cmds

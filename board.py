@@ -32,7 +32,6 @@ class Board:
         self.old_seed = 0
         self.seed = seed
         self.steps = []
-        self.current_actions=[]
         self.current_unit = None
         self.old_lines_cleared = 0
         self.word_count = {} #map from power word -> number of times used
@@ -43,26 +42,16 @@ class Board:
         self.step_hook = step_hook
         self.moves = 0
 
-        self.step()
+        self.step(NewUnitAction())
 
     def install_step_hook(self, step_hook):
         self.step_hook = step_hook
 
-    def step(self,cmd=None):
-        if self.current_unit is None:
-            self.next_unit_action()
-        elif isinstance(cmd, Command):
-            self.command(cmd)
-        elif isinstance(cmd, PowerWord):
-            self.power_word(cmd)
-        else:
-            raise TypeError(type(cmd))
-        current_step = Step(self.current_actions)
-        self.steps.append(current_step)
-        self.current_actions=[]
+    def step(self,action):
+        self.steps.append(action)
+        action.do(self)
         if self.step_hook is not None:
             self.step_hook(self, False, cmd)
-        return current_step
 
     def place_unit(self,unit):
         for pt in unit.get_pts():
@@ -71,12 +60,11 @@ class Board:
     def undo_last_step(self):
         self.error=False
         self.is_full = False
-        step = self.steps.pop()
-        for action in step.actions:
-            action.undo(self)
-            if self.step_hook is not None and type(action) is CommandAction:
-                self.step_hook(self, True, action.cmd)
-        return step
+        action = self.steps.pop()
+        action.undo(self)
+        if self.step_hook is not None and type(action) is CommandAction:
+            self.step_hook(self, True, action.cmd)
+        return action
 
     def is_complete(self):
         return (self.sources_remaining==0 and self.current_unit is None) or self.is_full
@@ -84,37 +72,12 @@ class Board:
     # returns the list of commands/power words needed to reach the current state
     def get_solution(self):
         solution = []
-        for step in self.steps:
-            for action in step.actions:
-                if type(action) is CommandAction:
-                    solution.append(action.cmd)
-                elif type(action) is Power:
-                    solution.append(action)
+        for action in self.steps:
+            if type(action) is CommandAction:
+                solution.append(action.cmd)
+            elif type(action) is Power:
+                solution.append(action)
         return solution
-
-    def next_unit_action(self):
-        a = NewUnitAction()
-        a.do(self)
-        self.current_actions.append(a)
-
-    def rng_action(self):
-        a = RngAction(self.current_unit)
-        r = a.do(self)
-        self.current_actions.append(a)
-        return r
-
-    """ returns True if successful, False if an error move occurred. State is left in Error """
-    def command(self, cmd):
-        act = CommandAction(cmd)
-        self.current_actions.append(act)
-        act.do(self)
-        return not self.error
-
-    def power_word(self, word):
-        act = Power(word)
-        act.do(self)
-        self.current_actions.append(act)
-        return act.completed
 
     def is_cell_valid(self, point):
         return not ((point.x < 0) or (point.x >= self.width) or (point.y < 0) or (point.y >= self.height))
