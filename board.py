@@ -56,8 +56,7 @@ class Board:
         elif isinstance(cmd, Command):
             self.command(cmd)
         elif isinstance(cmd, PowerWord):
-            if not self.power_word(cmd):
-                return
+            self.power_word(cmd)
         else:
             raise TypeError(type(cmd))
         current_step = Step(self.current_actions)
@@ -117,8 +116,7 @@ class Board:
     def power_word(self, word):
         act = Power(word)
         act.do(self)
-        if act.completed:
-            self.current_actions.append(act)
+        self.current_actions.append(act)
         return act.completed
 
     def is_cell_valid(self, point):

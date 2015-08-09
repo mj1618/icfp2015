@@ -100,6 +100,8 @@ class RowAction(BoardAction):
                 board.grid[y-1][x]=board.grid[y][x]
         for x in range(0,board.width):
             board.grid[self.y][x] = 1
+    def __str__(self):
+        return "ClearRow(%d)" % self.y
 
 class ScoreAction(Action):
     def __init__(self,amount):
@@ -129,16 +131,22 @@ class RngAction(Action):
         # return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
 class Power(Action):
-    def __init__(self,word):
+    def __init__(self,word,single_unit=False):
         self.subactions=[]
         self.word=word
         self.completed = False
+        #True causes the action to immediately stop if spawning a new unit
+        self.single_unit = single_unit
 
     def _do(self,board):
+        unit = None
+        if self.single_unit:
+            unit = board.current_unit
         for cmd in self.word.cmds:
             self.subaction(CommandAction(cmd), board)
-            if board.error:
-                self.subundo(board)
+            if board.error or board.current_unit == None:
+                return False
+            if self.single_unit and board.current_unit != unit:
                 return False
         board.score+=2*len(self.word)
         count = board.word_count.get(self.word, 0)
@@ -154,8 +162,8 @@ class Power(Action):
             logger.msg(result + ": invoking phrase of power: " + str(self.word))
 
     def _undo(self,board):
+        self.subundo(board)
         if self.completed:
-            self.subundo(board)
             board.score-=2*len(self.word)
             count = board.word_count[self.word]
             if count == 2:

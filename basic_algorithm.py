@@ -43,7 +43,7 @@ class BasicAlgorithm:
                     return
                 elif self.board.error:
                     self.board.undo_last_step()
-                elif pw.completed:
+                elif step is not None:
                     success=True
                     break
 
