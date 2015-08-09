@@ -14,7 +14,7 @@ class BasicAlgorithm:
         self.i = 0
         if step_hook is not None:
             board.install_step_hook(step_hook)
-        random.seed(0)
+        random.seed(board.seed)
 
 
     def start(self):

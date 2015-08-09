@@ -28,16 +28,23 @@ def get_axis_words(power):
     axis_word_cache[power] = words
     return words
 
-def next_cmd(axes, words, tried):
+def next_cmd(axes, words, rots, tried):
     for axis in axes:
         dir = axis[1]
         for pw in words[dir]:
             if pw not in tried:
+                tried.append(pw)
                 return pw
     for axis in axes:
         dir = axis[1]
         if Move(dir) not in tried:
+            tried.append(Move(dir))
             return Move(dir)
+    for rot in rots:
+        if rot not in tried:
+            tried.append(rot)
+            return rot[1]
+
     return None
 
 class PathFinder:
@@ -59,6 +66,7 @@ class PathFinder:
 
     def find_path(self):
         ms = [Move(E),Move(SE),Move(SW),Move(W)]
+        rotations = [ (i, Rotation(Clockwise)) for i in range(0,5)]
         original_steps = len(self.board.steps)
 
         if self.unit_end is None:
@@ -69,19 +77,18 @@ class PathFinder:
             try_history = []
             been = []
 
-            while not self.board.current_unit.rotation_matches(self.unit_end.current_rotation):
-                self.board.step(Rotation(Clockwise))
+            # while not self.board.current_unit.rotation_matches(self.unit_end.current_rotation):
+            #     self.board.step(Rotation(Clockwise))
 
             while not self.complete():
                 been.append(self.board.current_unit.pivot)
                 d = self.unit_end.pivot.delta(self.unit_start.pivot)
                 axes = axis_sort(d)
 
-                cmd = next_cmd(axis_sort(d), self.words, tried)
+                cmd = next_cmd(axis_sort(d), self.words, rotations, tried)
 
                 if cmd is not None:
                     self.board.step(cmd)
-                    tried.append(cmd)
                     if self.board.error or self.board.current_unit != self.unit_start or self.board.current_unit.pivot in been:
                         self.board.undo_last_step()
                     else:
