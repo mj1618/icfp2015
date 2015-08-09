@@ -179,7 +179,7 @@ class NewUnitAction(Action):
         if self.unit is not None:
             for pt in self.unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
-        for subaction in self.subactions.reverse():
+        for subaction in reversed(self.subactions):
             subaction.undo(board)
         board.is_full = False
         if board.current_unit is not None:
