@@ -91,7 +91,7 @@ class Board:
         return step
 
     def is_complete(self):
-        return self.sources_remaining==0 or self.is_full
+        return (self.sources_remaining==0 and self.current_unit is None) or self.is_full
 
     def record_solution(self):
         solution = []
