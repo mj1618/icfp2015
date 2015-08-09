@@ -66,7 +66,7 @@ class CommandAction(BoardAction):
         board.moves -= 1
         if self.lock:
             self.subundo(board)
-        else:
+        elif not board.error:
             board.current_unit.undo(self.cmd)
         board.error = False
     def __repr__(self):
