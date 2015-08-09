@@ -66,7 +66,7 @@ def run_problems(start,end):
             prob = copy.deepcopy(test_prob)
             test_board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=seed,sources_length=prob["sourceLength"],step_hook=hook)
 
-            algo = PfpAlgorithm(test_board, step_hook=hook)
+            algo = PfpAlgorithm(test_board, KnownWords, step_hook=hook)
             algo.start()
 
             print("%d"%test_board.score)
@@ -130,7 +130,7 @@ def main(args):
 
     submit_data = []
 
-    algo = PfpAlgorithm(test_board)
+    algo = PfpAlgorithm(test_board, KnownWords)
     algo.start()
 
 

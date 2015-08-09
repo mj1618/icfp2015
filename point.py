@@ -64,6 +64,9 @@ class HexPt:
         self.sw = sw
         self.ident = ident
 
+    def __deepcopy__(self, dict):
+        return self
+
     def __add__(self, other):
         return HexPt(self.e + other.e, self.se + other.se, self.sw + other.sw)
 
@@ -79,10 +82,22 @@ class HexPt:
         return "(%dE %dSE %dSW)" % (self.e, self.se, self.sw)
 
     def __eq__(self, other):
+        if not isinstance(other, HexPt):
+            return False
         return self.e == other.e and self.se == other.se and self.sw == other.sw
 
     def __hash__(self):
         return hash(repr(self))
+
+    def canonicalise(self):
+        # XXX won't work on upwards directions
+        if self.e > 0 and self.sw > 0:   # E + SW is equivalent to SE
+            n = min(self.e, self.sw)
+            return HexPt(self.e - n, self.se + n, self.sw - n)
+        elif self.e < 0 and self.se > 0: # W + SE is equivalent to SW
+            n = min(-self.e, self.se)
+            return HexPt(self.e + n, self.se - n, self.sw + n)
+        return self
 
     def clockwise(self):
         """Rotates this point clockwise around 0E 0SE 0SW"""

@@ -39,13 +39,12 @@ class BasicAlgorithm:
         self.i += 1
         if self.i%3 ==0:
             for w in pws.words:
-                pw=Power(w,pws.decode(w))
-                step = self.board.power_step(pw)
+                step = self.board.step(w)
                 if self.board.is_complete():
                     return
                 elif self.board.error:
                     self.board.undo_last_step()
-                elif pw.completed:
+                elif step is not None:
                     success=True
                     break
 

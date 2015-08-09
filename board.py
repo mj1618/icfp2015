@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from render import *
 from point import *
+from unit import *
+from words import *
 import copy
 from actions import *
 RNG_MOD = 2**32
@@ -51,8 +53,12 @@ class Board:
     def step(self,cmd=None):
         if self.current_unit is None:
             self.next_unit_action()
-        else:
+        elif isinstance(cmd, Command):
             self.command(cmd)
+        elif isinstance(cmd, PowerWord):
+            self.power_word(cmd)
+        else:
+            raise TypeError(type(cmd))
         current_step = Step(self.current_actions)
         self.steps.append(current_step)
         self.current_actions=[]
@@ -65,21 +71,6 @@ class Board:
     def place_unit(self,unit):
         for pt in unit.get_pts():
             self.grid[pt.y][pt.x] = 1
-
-    def power_step(self,action):
-        if self.current_unit is None:
-            self.next_unit_action()
-        else:
-            action.do(self)
-            if not action.completed:
-                return
-            self.current_actions.append(action)
-        current_step = Step(self.current_actions)
-        self.steps.append(current_step)
-        self.current_actions=[]
-        if self.is_complete():
-            self.record_solution()
-        return current_step
 
     def undo_last_step(self):
         self.error=False
@@ -120,6 +111,13 @@ class Board:
         act = CommandAction(cmd)
         self.current_actions.append(act)
         act.do(self)
+        return not self.error
+
+    def power_word(self, word):
+        act = Power(word)
+        act.do(self)
+        self.current_actions.append(act)
+        return act.completed
 
     def is_cell_valid(self, point):
         return not ((point.x < 0) or (point.x >= self.width) or (point.y < 0) or (point.y >= self.height))

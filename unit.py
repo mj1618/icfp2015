@@ -14,6 +14,7 @@ class Command:
     instances = {W: None, E: None, SW: None, SE: None, Clockwise: None, Counterwise: None}
     def __deepcopy__(self,dict):
         return self
+
 class Move(Command):
     def __new__(cls, dir):
         if Command.instances[dir] is None:

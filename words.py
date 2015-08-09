@@ -16,31 +16,54 @@ for key, val in chars.items():
     for char in val:
         command[char] = key
 
+def decode_word(word):
+    return [command[c] for c in word]
+
+class PowerWord:
+    def __init__(self, word):
+        self.word = word.lower()
+        self.cmds = decode_word(self.word)
+        self.net_displacement = HexPt(0,0,0)
+        self.net_rotation = 0
+        for c in self.cmds:
+            if isinstance(c, Move):
+                self.net_displacement += c.dir
+            elif isinstance(c, Rotation):
+                self.net_rotation += 1 if c.rot is Clockwise else -1
+        self.net_displacement = self.net_displacement.canonicalise()
+
+    def __str__(self):
+        return self.word
+
+    def __len__(self):
+        return len(self.word)
+
 class PowerWords:
     def __init__(self, *words):
-        self.words = [ w.lower() for w in words]
-        self.words.sort(key=lambda w: len(w), reverse=True)
+        self.words = [ PowerWord(w) for w in words]
+        self.words.sort(key=lambda w: len(w), reverse=True) #longest words first
 
     def encode1(self, action):
         if isinstance(action, Command):
             return chars[action][0]
         elif isinstance(action, Power):
-            return action.word
+            return str(action.word)
         raise TypeError(type(action))
 
     def encode(self, actions):
         return "".join([self.encode1(action) for action in actions])
-
-    def decode(self, word):
-        return [command[c] for c in word]
 
 KnownWords = PowerWords("Ei!","Ia! Ia!","R'lyeh","Yuggoth","cthulhu")
 
 if __name__ == "__main__":
     w, sw, se, e = Move(W), Move(SW), Move(SE), Move(E)
     cw, ccw = Rotation(Clockwise), Rotation(Counterwise)
-    assert KnownWords.decode("ei!") == [e, sw, w]
-    assert KnownWords.decode("ia! ia!") == [sw, sw, w, se, sw, sw, w]
-    assert KnownWords.decode("yuggoth") == [e, ccw, sw, sw, se, ccw, sw]
-    assert KnownWords.decode("cthulhu") == [e, ccw, sw, ccw, se, sw, ccw]
-    assert KnownWords.decode("r'lyeh") == [cw, w, se, e, e, sw]
+    assert decode_word("ei!") == [e, sw, w]
+    assert decode_word("ia! ia!") == [sw, sw, w, se, sw, sw, w]
+    assert decode_word("yuggoth") == [e, ccw, sw, sw, se, ccw, sw]
+    assert decode_word("cthulhu") == [e, ccw, sw, ccw, se, sw, ccw]
+    assert decode_word("r'lyeh") == [cw, w, se, e, e, sw]
+    assert PowerWord("yuggoth").net_displacement == HexPt(0, 2, 2)
+    assert PowerWord("yuggoth").net_rotation == -2
+    assert PowerWord("r'lyeh").net_displacement == HexPt(0, 2, 0)
+    assert PowerWord("r'lyeh").net_rotation == 1
