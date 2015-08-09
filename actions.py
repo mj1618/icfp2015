@@ -17,7 +17,7 @@ class Step:
         for a in self.actions:
             a.undo(board)
     def __str__(self):
-        return [ str(a) for a in self.actions]
+        return "Step" + str([str(a) for a in self.actions])
     def command(self):
         for action in self.actions:
             if type(action) is CommandAction:
@@ -42,20 +42,18 @@ class RowAction(Action):
     def __init__(self,y):
         self.y=y
     def do(self,board):
-        grid = copy.deepcopy(board.grid)
         for x in range(0,board.width):
-            grid[0][x] = 0
-        for y in range(1,self.y+1):
+            board.grid[0][x] = 0
+        for y in range(self.y, 0, -1):
             for x in range(0,board.width):
-                grid[y][x]=board.grid[y-1][x]
+                board.grid[y][x]=board.grid[y-1][x]
 
     def undo(self,board):
-        grid = copy.deepcopy(board.grid)
-        for x in range(0,board.width):
-            grid[self.y][x] = 1
-        for y in range(1,self.y+1):
+        for y in range(1,self.y):
             for x in range(0,board.width):
-                grid[y-1][x]=board.grid[y][x]
+                board.grid[y-1][x]=board.grid[y][x]
+        for x in range(0,board.width):
+            board.grid[self.y][x] = 1
 
 class ScoreAction(Action):
     def __init__(self,amount):
@@ -131,15 +129,35 @@ class NewUnitAction(Action):
     def __init__(self):
         self.unit=None
         self.index = 0
+        self.subactions = []
+        self.saved_old_lines = 0
+
+    def subaction(self, action, board):
+        action.do(board)
+        self.subactions.append(action)
 
     def do(self,board):
 
         self.unit = board.current_unit
+        self.saved_old_lines = board.old_lines_cleared
 
         # convert previous current_unit into filled cells
         if board.current_unit != None:
+            rows = []
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
+                if pt.y not in rows:
+                    rows.append(pt.y)
+            # check for completed rows, top to bottom
+            rows.sort()
+            lines_cleared = 0
+            for y in rows:
+                # could avoid scanning whole row by tracking how many cells are filled per row
+                if sum(board.grid[y]) == board.width:
+                    self.subaction(RowAction(y), board)
+                    lines_cleared += 1
+            self.subaction(ScoreAction(board.calculate_score(lines_cleared)), board)
+            board.old_lines_cleared = lines_cleared
 
         if board.sources_remaining==0:
             board.current_unit = None
@@ -158,9 +176,13 @@ class NewUnitAction(Action):
 
 
     def undo(self,board):
-        board.current_unit=self.unit
-        if board.current_unit is not None:
-            for pt in board.current_unit.get_pts():
+        if self.unit is not None:
+            for pt in self.unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
+        for subaction in self.subactions.reverse():
+            subaction.undo(board)
         board.is_full = False
-        board.sources_remaining+=1
+        if board.current_unit is not None:
+            board.sources_remaining+=1
+        board.old_lines_cleared = self.saved_old_lines
+        board.current_unit=self.unit

@@ -34,7 +34,6 @@ class Board:
         self.steps = []
         self.current_actions=[]
         self.current_unit = None
-        self.current_lines_cleared = 0
         self.old_lines_cleared = 0
         self.word_count = {} #map from power word -> number of times used
         self.score = 0
@@ -124,9 +123,6 @@ class Board:
             lock = self.is_lock()
             if lock:
                 self.current_unit.undo(cmd)
-                score_action = ScoreAction(self.calculate_score())
-                score_action.do(self)
-                self.current_actions.append(score_action)
                 self.next_unit_action()
         self.current_actions.append(CommandAction(cmd,lock))
 
@@ -142,8 +138,8 @@ class Board:
         else: return True
         return False
 
-    def calculate_score(self):
-        points = len(self.current_unit.mask) + 100*(1+self.current_lines_cleared)*self.current_lines_cleared//2
+    def calculate_score(self, lines_cleared):
+        points = len(self.current_unit.mask) + 100*(1+lines_cleared)*lines_cleared//2
         if self.old_lines_cleared > 1:
             line_bonus = (self.old_lines_cleared-1)*points//10
         else:
