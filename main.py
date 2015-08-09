@@ -4,6 +4,7 @@ import time
 
 from pprint import pprint
 import loader
+import logger
 from board import *
 from unit import *
 from point import *
@@ -41,7 +42,6 @@ def path_finder_test():
 def display(board, is_undo, cmd):
     print("%s: %s" % ("UNDO" if is_undo else "DO", str(cmd)))
     print(board)
-    print("   Score:", board.score)
     print("")
 
 def run_problem(p):
@@ -110,18 +110,15 @@ def animate(delay=0.1):
     return show_frame
 
 def main(args):
-
-
-    hook = None
-    if args.v:
-        hook = display
-    elif args.a:
-        hook = animate(args.a/10)
-
     probs = loader.get_qualifier_problems(args.p)
     
+    if args.v:
+        logger.enable(logger.Print())
+    elif args.a:
+        logger.enable(logger.Animate(Animator(args.a/10)))
+
     test_prob = probs[0]
-    test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0],sources_length=test_prob["sourceLength"],step_hook=hook)
+    test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0],sources_length=test_prob["sourceLength"])
     print("loaded")
 
     # while not test_board.is_complete():
@@ -131,11 +128,9 @@ def main(args):
     # test_board.step(Rotation(Clockwise))
     # pdb.set_trace()
 
-
-
     submit_data = []
 
-    algo = PfpAlgorithm(test_board, step_hook=hook)
+    algo = PfpAlgorithm(test_board)
     algo.start()
 
 

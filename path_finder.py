@@ -22,14 +22,12 @@ class PathFinder:
 
     def finish_unit_basic(self):
         ba = BasicAlgorithm(self.board)
-        source = self.board.sources_remaining
-        while source == self.board.sources_remaining:
+        unit = self.board.current_unit
+        while self.board.current_unit == unit:
             ba.step()
 
     def find_path(self):
-
         ms = [Move(E),Move(SE),Move(SW),Move(W)]
-        source = self.board.sources_remaining
         original_steps = len(self.board.steps)
 
         if self.unit_end is None:
@@ -58,19 +56,19 @@ class PathFinder:
                     cmd = Move(W)
 
                 if cmd is None:
-                    for w in KnownWords.words:
-                        if w not in tried:
-                            cmd = w
-                            break
+                    # for w in KnownWords.words:
+                    #     if w not in tried:
+                    #         cmd = w
+                    #         break
                     for m in ms:
                         if m not in tried:
                             cmd = m
                             break
 
-
                 if cmd is not None:
 
-                    if self.board.error or sources != self.board.sources_remaining or self.board.current_unit.pivot in been:
+                    self.board.step(cmd)
+                    if self.board.error or self.board.current_unit != self.unit_start or self.board.current_unit.pivot in been:
                         self.board.undo_last_step()
                         tried.append(cmd)
                     else:
@@ -93,16 +91,16 @@ class PathFinder:
                 # input("PathFinder: Press enter to continue")
 
 
-        if source==self.board.sources_remaining:
+        if self.board.current_unit == self.unit_start:
+            # lock the piece by crashing into a neighbouring cell
             for cmd in ms:
-                if type(cmd) is Command:
-                    self.board.step(cmd)
-                else:
-                    self.board.power_step(cmd)
-                if source == self.board.sources_remaining:
+                self.board.step(cmd)
+                if self.board.current_unit == self.unit_start:
                     self.board.undo_last_step()
                 else:
                     break
+            if self.board.current_unit == self.unit_start:
+                raise Exception("path_finder failed to lock unit")
 
         cmds=[]
         for i in range(original_steps, len(self.board.steps)):
