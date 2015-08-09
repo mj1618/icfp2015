@@ -66,7 +66,7 @@ def run_problems(start,end):
             submit_data.append({
                 "problemId": args.p,
                 "seed": seed,
-                "solution": KnownWords.encode(test_board.solutions[0])
+                "solution": KnownWords.encode(algo.cmds)
             })
 
     loader.submit(submit_data)

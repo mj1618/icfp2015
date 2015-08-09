@@ -17,7 +17,7 @@ class PfpAlgorithm:
         self.i = 0
         if step_hook is not None:
             board.install_step_hook(step_hook)
-
+        self.cmds = []
 
     def start(self):
         while not self.board.is_complete():
@@ -35,5 +35,6 @@ class PfpAlgorithm:
         for cmd in pf.find_path():
            if cmd is not None:
                self.board.step(cmd)
+               self.cmds.append(cmd)
 
         # input("PFP: Press enter to continue")
