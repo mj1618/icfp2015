@@ -65,7 +65,7 @@ def run_problems(start,end):
             print("%d"%test_board.score)
 
             submit_data.append({
-                "problemId": args.p,
+                "problemId": p,
                 "seed": seed,
                 "solution": KnownWords.encode(algo.cmds)
             })
