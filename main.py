@@ -17,11 +17,11 @@ import sys
 import codecs
 from path_finder import *
 
-def replay_test():
-    prob = loader.get_qualifier_problems(6)[0]
+def replay_test(args):
+    prob = loader.get_qualifier_problems(args.p)[0]
     board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=0, sources_length=prob["sourceLength"])
     print(len(board.units))
-    alg = ReplayAlgorithm(board, "iiiiiiimimiiiiiimmimiiiimimimmimimimimmeemmimimiimmmmimmimiimimimmimmimeeemmmimimmimeeemiimiimimimiiiipimiimimmmmeemimeemimimimmmmemimmimmmiiimmmiiipiimiiippiimmmeemimiipimmimmipppimmimeemeemimiieemimmmm", Animator())
+    alg = ReplayAlgorithm(board, char_stream(sys.stdin), Animator())
     alg.start()
 
 def placer_test():
@@ -147,11 +147,12 @@ def main(args):
     #
 
 opts = argparse.ArgumentParser()
-group = opts.add_mutually_exclusive_group()
-group.add_argument("-v", help="display board state at each step", action="store_true")
-group.add_argument("-a", help="animate board state (specify again for slower frames)", action="count")
-group.add_argument("-r", help="run replay test", action="store_true")
-group.add_argument("-pf", help="run path finder test", action="store_true")
+dispgroup = opts.add_mutually_exclusive_group()
+dispgroup.add_argument("-v", help="display board state at each step", action="store_true")
+dispgroup.add_argument("-a", help="animate board state (specify again for slower frames)", action="count")
+actgroup = opts.add_mutually_exclusive_group()
+actgroup.add_argument("-r", help="run replay test", action="store_true")
+actgroup.add_argument("-pf", help="run path finder test", action="store_true")
 opts.add_argument("-p", type=int, help="select a qualifying problem", default=1)
 opts.add_argument("-all", help="run through and submit all problems", action="store_true")
 opts.add_argument("-s", help="submit solution to the specified problem", action="count")
@@ -160,10 +161,10 @@ opts.add_argument("-s", help="submit solution to the specified problem", action=
 if __name__ == "__main__":
     args = opts.parse_args()
     if args.r:
-        replay_test()
-    if args.pf:
+        replay_test(args)
+    elif args.pf:
         path_finder_test()
-    if args.all:
+    elif args.all:
         run_all()
     else:
         main(args)

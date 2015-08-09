@@ -42,20 +42,20 @@ class RowAction(Action):
     def __init__(self,y):
         self.y=y
     def do(self,board):
-        grid = copy.deepcopy(board.grid)
+        board.current_lines_cleared += 1
         for x in range(0,board.width):
-            grid[0][x] = 0
-        for y in range(1,self.y+1):
+            board.grid[0][x] = 0
+        for y in range(self.y, 0, -1):
             for x in range(0,board.width):
-                grid[y][x]=board.grid[y-1][x]
+                board.grid[y][x]=board.grid[y-1][x]
 
     def undo(self,board):
-        grid = copy.deepcopy(board.grid)
-        for x in range(0,board.width):
-            grid[self.y][x] = 1
-        for y in range(1,self.y+1):
+        for y in range(1,self.y):
             for x in range(0,board.width):
-                grid[y-1][x]=board.grid[y][x]
+                board.grid[y-1][x]=board.grid[y][x]
+        for x in range(0,board.width):
+            board.grid[self.y][x] = 1
+        board.current_lines_cleared -= 1
 
 class ScoreAction(Action):
     def __init__(self,amount):
@@ -131,6 +131,7 @@ class NewUnitAction(Action):
     def __init__(self):
         self.unit=None
         self.index = 0
+        self.subactions = []
 
     def do(self,board):
 
@@ -138,8 +139,19 @@ class NewUnitAction(Action):
 
         # convert previous current_unit into filled cells
         if board.current_unit != None:
+            rows = []
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 1
+                if pt.y not in rows:
+                    rows.append(pt.y)
+            # check for completed rows, top to bottom
+            rows.sort()
+            for y in rows:
+                # could avoid scanning whole row by tracking how many cells are filled per row
+                if sum(board.grid[y]) == board.width:
+                    action = RowAction(y)
+                    action.do(board)
+                    self.subactions.append(action)
 
         if board.sources_remaining==0:
             board.current_unit = None
@@ -162,5 +174,7 @@ class NewUnitAction(Action):
         if board.current_unit is not None:
             for pt in board.current_unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
+        for subaction in self.subactions.reverse():
+            subaction.undo(board)
         board.is_full = False
         board.sources_remaining+=1
