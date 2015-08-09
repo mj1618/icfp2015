@@ -11,8 +11,9 @@ from placer_algorithm import *
 from path_finder import PathFinder
 from basic_algorithm import *
 class PfpAlgorithm:
-    def __init__(self,board,step_hook=None):
+    def __init__(self,board,power,step_hook=None):
         self.board=board
+        self.power = power
         self.last_pos = [0,0]
         self.i = 0
         if step_hook is not None:
@@ -31,7 +32,7 @@ class PfpAlgorithm:
         except:
             unit = None
 
-        pf = PathFinder(self.board, self.board.current_unit, unit)
+        pf = PathFinder(self.board, self.board.current_unit, unit, self.power)
         for cmd in pf.find_path():
            if cmd is not None:
                self.cmds.append(cmd)

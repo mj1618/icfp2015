@@ -16,10 +16,13 @@ for key, val in chars.items():
     for char in val:
         command[char] = key
 
+def decode_word(word):
+    return [command[c] for c in word]
+
 class PowerWords:
     def __init__(self, *words):
         self.words = [ w.lower() for w in words]
-        self.words.sort(key=lambda w: len(w), reverse=True)
+        self.words.sort(key=lambda w: len(w), reverse=True) #longest words first
 
     def encode1(self, action):
         if isinstance(action, Command):
@@ -31,16 +34,13 @@ class PowerWords:
     def encode(self, actions):
         return "".join([self.encode1(action) for action in actions])
 
-    def decode(self, word):
-        return [command[c] for c in word]
-
 KnownWords = PowerWords("Ei!","Ia! Ia!","R'lyeh","Yuggoth","cthulhu")
 
 if __name__ == "__main__":
     w, sw, se, e = Move(W), Move(SW), Move(SE), Move(E)
     cw, ccw = Rotation(Clockwise), Rotation(Counterwise)
-    assert KnownWords.decode("ei!") == [e, sw, w]
-    assert KnownWords.decode("ia! ia!") == [sw, sw, w, se, sw, sw, w]
-    assert KnownWords.decode("yuggoth") == [e, ccw, sw, sw, se, ccw, sw]
-    assert KnownWords.decode("cthulhu") == [e, ccw, sw, ccw, se, sw, ccw]
-    assert KnownWords.decode("r'lyeh") == [cw, w, se, e, e, sw]
+    assert decode_word("ei!") == [e, sw, w]
+    assert decode_word("ia! ia!") == [sw, sw, w, se, sw, sw, w]
+    assert decode_word("yuggoth") == [e, ccw, sw, sw, se, ccw, sw]
+    assert decode_word("cthulhu") == [e, ccw, sw, ccw, se, sw, ccw]
+    assert decode_word("r'lyeh") == [cw, w, se, e, e, sw]

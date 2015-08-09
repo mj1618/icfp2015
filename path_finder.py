@@ -9,12 +9,12 @@ from random import randint
 from unit import *
 from basic_algorithm import *
 class PathFinder:
-    def __init__(self,board,unit_start,unit_end):
+    def __init__(self,board,unit_start,unit_end,power):
         self.board=board
         self.unit_start = unit_start
         self.unit_end = unit_end
+        self.power = power
         self.steps = []
-
 
 
     def complete(self):
@@ -56,10 +56,10 @@ class PathFinder:
                     cmd = Move(W)
 
                 if cmd is None:
-                    # for w in KnownWords.words:
-                    #     if w not in tried:
-                    #         cmd = w
-                    #         break
+                    for w in self.power.words:
+                        if w not in tried:
+                            cmd = w
+                            break
                     for m in ms:
                         if m not in tried:
                             cmd = m

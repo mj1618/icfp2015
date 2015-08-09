@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from render import *
 from point import *
+import words
 import copy
 import logger
 
@@ -129,9 +130,9 @@ class RngAction(Action):
         # return ((board.old_seed & RNG_MASK) >> RNG_TRUNC) % len(board.units)
 
 class Power(Action):
-    def __init__(self,word,cmds):
+    def __init__(self,word):
         self.subactions=[]
-        self.cmds=cmds
+        self.cmds=words.decode_word(word)
         self.word=word
         self.completed = False
 
