@@ -42,7 +42,6 @@ class RowAction(Action):
     def __init__(self,y):
         self.y=y
     def do(self,board):
-        board.current_lines_cleared += 1
         for x in range(0,board.width):
             board.grid[0][x] = 0
         for y in range(self.y, 0, -1):
@@ -55,7 +54,6 @@ class RowAction(Action):
                 board.grid[y-1][x]=board.grid[y][x]
         for x in range(0,board.width):
             board.grid[self.y][x] = 1
-        board.current_lines_cleared -= 1
 
 class ScoreAction(Action):
     def __init__(self,amount):
@@ -132,10 +130,16 @@ class NewUnitAction(Action):
         self.unit=None
         self.index = 0
         self.subactions = []
+        self.saved_old_lines = 0
+
+    def subaction(self, action, board):
+        action.do(board)
+        self.subactions.append(action)
 
     def do(self,board):
 
         self.unit = board.current_unit
+        self.saved_old_lines = board.old_lines_cleared
 
         # convert previous current_unit into filled cells
         if board.current_unit != None:
@@ -146,12 +150,14 @@ class NewUnitAction(Action):
                     rows.append(pt.y)
             # check for completed rows, top to bottom
             rows.sort()
+            lines_cleared = 0
             for y in rows:
                 # could avoid scanning whole row by tracking how many cells are filled per row
                 if sum(board.grid[y]) == board.width:
-                    action = RowAction(y)
-                    action.do(board)
-                    self.subactions.append(action)
+                    self.subaction(RowAction(y), board)
+                    lines_cleared += 1
+            self.subaction(ScoreAction(board.calculate_score(lines_cleared)), board)
+            board.old_lines_cleared = lines_cleared
 
         if board.sources_remaining==0:
             board.current_unit = None
@@ -178,4 +184,5 @@ class NewUnitAction(Action):
         board.is_full = False
         if board.current_unit is not None:
             board.sources_remaining+=1
+        board.old_lines_cleared = self.saved_old_lines
         board.current_unit=self.unit
