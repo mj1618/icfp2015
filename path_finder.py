@@ -141,14 +141,8 @@ class PathFinder:
 
         if self.board.current_unit == self.unit_start:
             # lock the piece by crashing into a neighbouring cell
-            for cmd in ms:
+            for cmd in ms + rotations:
                 self.board.step(CommandAction(cmd))
-                if self.board.current_unit == self.unit_start:
-                    self.board.undo_last_step()
-                else:
-                    break
-            for rot in rotations:
-                self.board.step(CommandAction(rot))
                 if self.board.current_unit == self.unit_start:
                     self.board.undo_last_step()
                 else:
