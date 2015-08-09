@@ -18,6 +18,8 @@ class Move(Command):
         if Command.instances[dir] is None:
             Command.instances[dir] = super(Move, cls).__new__(cls)
         return Command.instances[dir]
+    def __deepcopy__(self,memo):
+        return self
     def __init__(self, dir):
         self.dir = dir
     def __repr__(self):
@@ -31,6 +33,8 @@ class Rotation(Command):
         return Command.instances[rot]
     def __init__(self, rot):
         self.rot = rot
+    def __deepcopy__(self,memo):
+        return self
     def __repr__(self):
         return "Rotation(%swise)" % ("Clock" if self.rot is Clockwise else "Counter")
 
