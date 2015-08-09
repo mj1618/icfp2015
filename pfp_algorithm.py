@@ -31,5 +31,4 @@ class PfpAlgorithm:
         for cmd in pf.find_path():
            if cmd is not None:
                self.board.step(cmd)
-        self.board.step(Move(SE))
         # input("PFP: Press enter to continue")

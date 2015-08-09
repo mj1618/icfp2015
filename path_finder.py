@@ -63,7 +63,12 @@ class PathFinder:
                 if len(self.board.steps)>0:
                     last_tried = self.board.undo_last_step().command()
                 else:
-                    pass
+                    res=""
+                    for step in self.board.steps:
+                        res+=str(step.command())
+                    print(res)
+                    print(self.board)
+                    input("PathFinder: No commands left to try...")
             # input("PathFinder: Press enter to continue")
 
         res=""
