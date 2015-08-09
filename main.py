@@ -122,10 +122,10 @@ def main(args):
     algo.start()
 
 
-    print("%d"%test_board.score)
     print(test_board)
     print(test_board.solutions[0])
     print(KnownWords.encode(test_board.solutions[0]))
+    print("%d"%test_board.score)
 
     submit_data.append({
         "problemId": args.p,
