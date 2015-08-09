@@ -45,27 +45,28 @@ def display(board, is_undo, cmd):
 
 def run_all():
 
+    submit_data = []
     for p in range(0,25):
         print("Problem %d"%p)
         probs = loader.get_qualifier_problems(p)
         test_prob = probs[0]
-        test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0],sources_length=test_prob["sourceLength"])
+        for seed in test_prob["sourceSeeds"]:
 
-        submit_data = []
+            test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=seed,sources_length=test_prob["sourceLength"])
 
-        algo = BasicAlgorithm(test_board, step_hook=None)
-        algo.start()
 
-        print("%d"%test_board.score)
+            algo = BasicAlgorithm(test_board, step_hook=None)
+            algo.start()
 
-        submit_data.append({
-            "problemId": args.p,
-            "seed": test_prob["sourceSeeds"][0],
-            "tag": time.strftime("%H:%M:%S"),
-            "solution": KnownWords.encode(test_board.solutions[0])
-        })
+            print("%d"%test_board.score)
 
-        loader.submit(submit_data)
+            submit_data.append({
+                "problemId": args.p,
+                "seed": seed,
+                "solution": KnownWords.encode(test_board.solutions[0])
+            })
+
+    loader.submit(submit_data)
 
 class Animator:
     def __init__(self, delay=0.1):
