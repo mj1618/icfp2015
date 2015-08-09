@@ -36,7 +36,6 @@ class BasicAlgorithm:
         pws = KnownWords
         success = False
         self.i += 1
-        random.shuffle(pws.words)
         if self.i%3 ==0:
             for w in pws.words:
                 pw=Power(w,pws.decode(w))

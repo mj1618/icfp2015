@@ -49,6 +49,13 @@ def run_problem(p):
 
 def run_problems(start,end):
 
+
+    hook = None
+    if args.v:
+        hook = display
+    elif args.a:
+        hook = animate(args.a/10)
+
     submit_data = []
     for p in range(start,end):
         print("Problem %d"%p)
@@ -57,9 +64,9 @@ def run_problems(start,end):
         for seed in test_prob["sourceSeeds"]:
 
             prob = copy.deepcopy(test_prob)
-            test_board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=seed,sources_length=prob["sourceLength"])
+            test_board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=seed,sources_length=prob["sourceLength"],step_hook=hook)
 
-            algo = PfpAlgorithm(test_board, step_hook=None)
+            algo = PfpAlgorithm(test_board, step_hook=hook)
             algo.start()
 
             print("%d"%test_board.score)
