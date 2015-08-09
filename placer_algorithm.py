@@ -102,6 +102,11 @@ class PlacerAlgorithm:
         # r = self.board.rng_action()
         # self.board.current_unit = copy.deepcopy(self.board.units[r])
 
-        return self.board.current_unit
+        units = []
+        for s in score_table:
+            unit.pivot = s[1]
+            units.append(copy.deepcopy(unit))
+
+        return units
 
 

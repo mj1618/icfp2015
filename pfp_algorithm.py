@@ -28,11 +28,11 @@ class PfpAlgorithm:
         pa = PlacerAlgorithm(self.board)
         # pa.board.install_step_hook(None)
         try:
-            unit = pa.step()
+            units = pa.step()
         except:
-            unit = None
+            units = None
 
-        pf = PathFinder(self.board, self.board.current_unit, unit, self.power)
+        pf = PathFinder(self.board, self.board.current_unit, units, self.power)
         for cmd in pf.find_path():
            if cmd is not None:
                self.cmds.append(cmd)

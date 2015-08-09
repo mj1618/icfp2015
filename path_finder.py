@@ -33,30 +33,30 @@ def next_cmd(axes, words, rots, tried):
         dir = axis[1]
         for pw in words[dir]:
             if pw not in tried:
-                tried.append(pw)
+                tried.add(pw)
                 return pw
     for axis in axes:
         dir = axis[1]
         if Move(dir) not in tried:
-            tried.append(Move(dir))
+            tried.add(Move(dir))
             return Move(dir)
     for rot in rots:
         if rot not in tried:
-            tried.append(rot)
+            tried.add(rot)
             return rot[1]
 
     return None
 
 class PathFinder:
-    def __init__(self,board,unit_start,unit_end,power):
+    def __init__(self,board,unit_start,unit_ends,power):
         self.board=board
         self.unit_start = unit_start
-        self.unit_end = unit_end
+        self.unit_ends = unit_ends
         self.words = get_axis_words(power)
         self.steps = []
 
     def complete(self):
-        return self.unit_start == self.unit_end
+        return self.unit_start == self.unit_ends[0]
 
     def finish_unit_basic(self):
         ba = BasicAlgorithm(self.board)
@@ -69,11 +69,11 @@ class PathFinder:
         rotations = [ (i, Rotation(Clockwise)) for i in range(0,5)]
         original_steps = len(self.board.steps)
 
-        if self.unit_end is None:
+        if len(self.unit_ends) == 0:
             self.finish_unit_basic()
         else:
             self.board.current_unit = self.unit_start
-            tried = []
+            tried = set()
             try_history = []
             been = []
 
@@ -82,7 +82,7 @@ class PathFinder:
 
             while not self.complete():
                 been.append(self.board.current_unit.pivot)
-                d = self.unit_end.pivot.delta(self.unit_start.pivot)
+                d = self.unit_ends[0].pivot.delta(self.unit_start.pivot)
                 axes = axis_sort(d)
 
                 cmd = next_cmd(axis_sort(d), self.words, rotations, tried)
@@ -93,11 +93,13 @@ class PathFinder:
                         self.board.undo_last_step()
                     else:
                         try_history.append(tried)
-                        tried = []
+                        tried = set()
                 else:
                     if len(try_history)>0:
                         self.board.undo_last_step()
                         tried = try_history.pop()
+                    elif len(self.unit_ends)>1:
+                        self.unit_ends.pop(0)
                     else:
                         res=""
                         for step in self.board.steps:
