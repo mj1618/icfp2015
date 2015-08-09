@@ -73,7 +73,7 @@ class PlacerAlgorithm:
             score = len(holes)*20 + max_alt*1 + roughness*1
     
             print("{} => Score {} (Hole count: {}, Max altitude: {}, Roughness: {})".format(p, score, holes, max_alt, roughness))
-            print(self.board)
+            #print(self.board)
 
             # record the score, undo placement
             score_table.append((score, p))

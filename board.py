@@ -206,7 +206,7 @@ class Board:
                 return result
 
             sw = p.move(SW)
-            if (sw not in path) and self.is_cell_valid(sw) and self.grid[sw.y][sw.x] == 1:
+            if (sw not in path) and ((sw.y == self.height) or (self.is_cell_valid(sw) and self.grid[sw.y][sw.x])) == 1:
                 path.add(sw)
                 result = _follow(sw, path)
                 path.remove(sw)
