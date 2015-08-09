@@ -32,4 +32,4 @@ class PfpAlgorithm:
            if cmd is not None:
                self.board.step(cmd)
         self.board.step(Move(SE))
-        input("Press enter to continue")
+        input("PFP: Press enter to continue")

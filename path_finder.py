@@ -20,7 +20,7 @@ class PathFinder:
 
     def find_path(self):
         self.board.current_unit = self.unit_start
-
+        self.board.steps = []
         last_tried = None
 
         while not self.board.current_unit.rotation_matches(self.unit_end.current_rotation):
@@ -59,6 +59,7 @@ class PathFinder:
                     last_tried = None
             else:
                 last_tried = self.board.undo_last_step().command()
+            input("PathFinder: Press enter to continue")
 
         res=""
         cmds = []
