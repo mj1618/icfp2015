@@ -79,6 +79,7 @@ def run_problems(start,end):
 
     loader.submit(submit_data)
 
+
 def run_all():
     run_problems(0,25)
 
@@ -146,7 +147,6 @@ def main(args):
     submit_data.append({
         "problemId": args.p,
         "seed": test_prob["sourceSeeds"][0],
-        "tag": time.strftime("%H:%M:%S"),
         "solution": KnownWords.encode(test_board.solutions[0])
     })
 
@@ -154,7 +154,7 @@ def main(args):
     for step in test_board.steps:
         for action in step.actions:
             pprint(vars(action))
-    if args.s > 0:
+    if args.s:
         loader.submit(submit_data)
     #
     # for step in test_board.steps:

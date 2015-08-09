@@ -58,18 +58,18 @@ class PathFinder:
                     cmd = Move(W)
 
                 if cmd is None:
-                    if Move(E) not in tried:
-                        cmd = Move(E)
-                    elif Move(SE) not in tried:
-                        cmd = Move(SE)
-                    elif Move(SW) not in tried:
-                        cmd = Move(SW)
-                    elif Move(W) not in tried:
-                        cmd = Move(W)
+                    for w in KnownWords.words:
+                        if w not in tried:
+                            cmd = w
+                            break
+                    for m in ms:
+                        if m not in tried:
+                            cmd = m
+                            break
 
 
                 if cmd is not None:
-                    self.board.step(cmd)
+
                     if self.board.error or sources != self.board.sources_remaining or self.board.current_unit.pivot in been:
                         self.board.undo_last_step()
                         tried.append(cmd)
@@ -95,7 +95,10 @@ class PathFinder:
 
         if source==self.board.sources_remaining:
             for cmd in ms:
-                self.board.step(cmd)
+                if type(cmd) is Command:
+                    self.board.step(cmd)
+                else:
+                    self.board.power_step(cmd)
                 if source == self.board.sources_remaining:
                     self.board.undo_last_step()
                 else:
