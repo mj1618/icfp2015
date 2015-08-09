@@ -43,7 +43,7 @@ def next_cmd(axes, words, rots, tried):
     for rot in rots:
         if rot not in tried:
             tried.add(rot)
-            return rot[1]
+            return rot
 
     return None
 
@@ -56,7 +56,7 @@ class PathFinder:
         self.steps = []
         self.lowest_y = 0
         self.checking_lowest = False
-        self.lowest_unit = copy.deepcopy(self.unit_start)
+        self.lowest_unit = None
 
     def complete(self):
         return self.unit_start == self.unit_ends[0] or (self.checking_lowest and self.board.current_unit.pivot.y == self.lowest_y)
@@ -70,26 +70,27 @@ class PathFinder:
     def check_lowest(self):
         if self.checking_lowest is False and self.board.current_unit.pivot.y > self.lowest_y:
             self.lowest_unit = copy.deepcopy(self.unit_ends[0])
+            # self.lowest_unit = copy.deepcopy(self.board.current_unit)
             self.lowest_y = self.lowest_unit.pivot.y
 
     def find_path(self):
         ms = [Move(E),Move(SE),Move(SW),Move(W)]
-        rotations = [] # [ (i, Rotation(Clockwise)) for i in range(0,5)]
+        rotations = [Rotation(Clockwise),Rotation(Counterwise)]
         original_steps = len(self.board.steps)
 
-        if len(self.unit_ends) == 0:
+        if self.unit_ends is None or len(self.unit_ends) == 0:
             self.finish_unit_basic()
         else:
             self.board.current_unit = self.unit_start
             tried = set()
             try_history = []
-            been = []
+            been = set()
 
             # while not self.board.current_unit.rotation_matches(self.unit_end.current_rotation):
             #     self.board.step(Rotation(Clockwise))
 
             while not self.complete():
-                been.append(self.board.current_unit.pivot)
+                been.add(self.board.current_unit)
                 self.check_lowest()
                 d = self.unit_ends[0].pivot.delta(self.unit_start.pivot)
                 axes = axis_sort(d)
@@ -98,7 +99,7 @@ class PathFinder:
 
                 if cmd is not None:
                     self.board.step(cmd)
-                    if self.board.error or self.board.current_unit != self.unit_start or self.board.current_unit.pivot in been:
+                    if self.board.error or self.board.current_unit != self.unit_start or self.board.current_unit in been:
                         self.board.undo_last_step()
                     else:
                         try_history.append(tried)
@@ -109,7 +110,10 @@ class PathFinder:
                         tried = try_history.pop()
                     elif len(self.unit_ends)>1:
                         self.unit_ends.pop(0)
-                    elif self.checking_lowest is False:
+                        try_history = []
+                        been = set()
+                        tried = set()
+                    elif self.checking_lowest is False and self.lowest_unit is not None:
                         # res=""
                         # for step in self.board.steps:
                         #     res+=str(step.command())
@@ -122,6 +126,10 @@ class PathFinder:
                         self.checking_lowest = True
                         self.unit_ends.pop(0)
                         self.unit_ends.append(copy.deepcopy(self.lowest_unit))
+
+                        try_history = []
+                        been = set()
+                        tried = set()
                     else:
                         print("PathFinder: No commands left to try, even lowest unit")
                         self.finish_unit_basic()
@@ -140,11 +148,14 @@ class PathFinder:
                 else:
                     break
             for rot in rotations:
-                self.board.step(rot[1])
+                self.board.step(rot)
                 if self.board.current_unit == self.unit_start:
                     self.board.undo_last_step()
                 else:
                     break
+
+            if self.board.current_unit == self.unit_start:
+                self.finish_unit_basic()
             if self.board.current_unit == self.unit_start:
                 print(self.lowest_unit)
                 print(self.board)
