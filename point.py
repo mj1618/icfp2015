@@ -20,6 +20,8 @@ class Pt:
         return "(%dX %dY)" % (self.x, self.y)
 
     def __eq__(self, other):
+        if not isinstance(other, Pt):
+            return False
         return self.x == other.x and self.y == other.y
 
     def __hash__(self):

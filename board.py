@@ -41,6 +41,7 @@ class Board:
         self.is_full = False
         self.step_hook = step_hook
         self.moves = 0
+        self.path_target = None #visualisation only
 
         self.step(NewUnitAction())
 
@@ -99,6 +100,10 @@ class Board:
         move_score = points+line_bonus
         return move_score
 
+    # just for debugging -- path_target cell is displayed differently
+    def set_path_target(self, pt):
+        self.path_target = pt
+
     def query_cell(self, y, x):
         assert self.is_cell_valid(Pt(x,y))
         if self.grid[y][x]:
@@ -112,6 +117,8 @@ class Board:
                 return BOARD_UNIT
             elif pivot:
                 return BOARD_PIVOT
+        if Pt(x,y) == self.path_target:
+            return "@"
         return BOARD_EMPTY
 
 
@@ -120,7 +127,7 @@ class Board:
         status = ""
         if self.error: status="ERROR"
         elif self.is_complete(): status="DONE"
-        detail = " %5s   Score: %d   Moves: %d   Remain: %d" % (status, self.score, self.moves, self.sources_remaining)
+        detail = " %5s   Score: %d   Moves: %d   Remain: %d  Target: %s" % (status, self.score, self.moves, self.sources_remaining, str(self.path_target))
         return grid + detail
 
     def get_base_heightmap(self):

@@ -84,6 +84,7 @@ class PathFinder:
             tried = set()
             try_history = []
             been = set()
+            self.board.set_path_target(self.unit_ends[0].pivot)
 
             # while not self.board.current_unit.rotation_matches(self.unit_end.current_rotation):
             #     self.board.step(Rotation(Clockwise))
@@ -112,6 +113,7 @@ class PathFinder:
                         try_history = []
                         been = set()
                         tried = set()
+                        self.board.set_path_target(self.unit_ends[0].pivot)
                     elif self.checking_lowest is False and self.lowest_unit is not None:
                         # res=""
                         # for step in self.board.steps:
@@ -135,7 +137,7 @@ class PathFinder:
 
 
                 # input("PathFinder: Press enter to continue")
-
+        self.board.set_path_target(None)
 
         if self.board.current_unit == self.unit_start:
             # lock the piece by crashing into a neighbouring cell
