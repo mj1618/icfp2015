@@ -173,47 +173,75 @@ class Board:
         column = 0
         row = 0
 
-        def _follow(p):
+        def _follow(p, path):
             ne = p.move(NE)
-            
-            if self.is_cell_valid(ne) and self.grid[ne.y][ne.x] == 1:
-                result = _follow(ne)
+            if (ne not in path) and self.is_cell_valid(ne) and self.grid[ne.y][ne.x] == 1:
+                path.add(ne)
+                result = _follow(ne, path)
+                path.remove(ne)
                 if result != -1:
-                    heightmap[ne.x] = ne.y
+                    heightmap[ne.x] = max(heightmap[ne.x], ne.y)
                 return result
             
+            # if we reach the other side, then we have a closed surface and can update the heightmap
             if p.x == (self.width-1):
                 return p.x
 
             e = p.move(E)
-            if (e.y == self.height) or (self.is_cell_valid(e) and self.grid[e.y][e.x]) == 1:
-                result = _follow(e)
+            if (e not in path) and ((e.y == self.height) or (self.is_cell_valid(e) and self.grid[e.y][e.x])) == 1:
+                path.add(e)
+                result = _follow(e, path)
+                path.remove(e)
                 if result != -1:
-                    heightmap[e.x] = e.y
+                    heightmap[e.x] = max(heightmap[e.x], e.y)
                 return result
                     
             se = p.move(SE)
-            if self.is_cell_valid(se) and self.grid[se.y][se.x] == 1:
-                result = _follow(se)
+            if (se not in path) and self.is_cell_valid(se) and self.grid[se.y][se.x] == 1:
+                path.add(se)
+                result = _follow(se, path)
+                path.remove(se)
                 if result != -1:
-                    heightmap[se.x] = se.y
+                    heightmap[se.x] = max(heightmap[se.x], se.y)
                 return result
 
-            # skip backtracking for now
-            # for now, return how far we got.
-            return p.x
+            sw = p.move(SW)
+            if (sw not in path) and self.is_cell_valid(sw) and self.grid[sw.y][sw.x] == 1:
+                path.add(sw)
+                result = _follow(sw, path)
+                path.remove(sw)
+                return result
+
+            w = p.move(W)
+            if (w not in path) and self.is_cell_valid(w) and self.grid[w.y][w.x] == 1:
+                path.add(w)
+                result = _follow(w, path)
+                path.remove(w)
+                return result
+
+            nw = p.move(NW)
+            if (nw not in path) and self.is_cell_valid(nw) and self.grid[nw.y][nw.x] == 1:
+                path.add(nw)
+                result = _follow(nw, path)
+                path.remove(nw)
+                return result
+
+
+            # we've hit a loop
+            return -1
             
 
+        path_cache = set()
         while (column < self.width):
             for row in range(self.height):
                 if self.grid[row][column] == 1:
-                    result = _follow(Pt(column, row))
+                    result = _follow(Pt(column, row), path_cache)
                     if result != -1:
                         heightmap[column] = row
                         column = result
                         break
                 elif row == self.height-1:
-                    result = _follow(Pt(column, row+1))
+                    result = _follow(Pt(column, row+1), path_cache)
                     if result != -1:
                         heightmap[column] = row+1
                         column = result

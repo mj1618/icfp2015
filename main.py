@@ -26,7 +26,7 @@ def replay_test(args):
     alg.start()
 
 def placer_test():
-    prob = loader.get_qualifier_problems(0)[0]
+    prob = loader.get_qualifier_problems(1)[0]
     board = Board(prob["width"], prob["height"], prob["grid"], prob["units"], seed=0, sources_length=prob["sourceLength"])
     alg = PlacerAlgorithm(board)
     alg.start()
