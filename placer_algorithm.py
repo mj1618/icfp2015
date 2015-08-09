@@ -69,10 +69,18 @@ class PlacerAlgorithm:
 
             holes = self.board.get_holes(include_unit=True)
             max_alt = self.board.get_max_altitude(include_unit=True)
-            roughness = sum([heightmap[i-1]-heightmap[i] for i in range(len(heightmap)-1) ])
-            score = len(holes)*20 + max_alt*1 + roughness*1
+            line_bonus = {}
+            #for p in unit.get_pts():
+            #    if p.y not in line_bonus:
+            #        line_bonus[p.y] = 0
+            #    line_bonus[p.y] += 1
+            #for y in line_bonus:
+            #    line_bonus[y] += sum(self.board.grid[y])
+            #    line_bonus[y] = 200//(self.board.width+1-line_bonus[y])
+
+            score = len(holes)*20 + max_alt*1 #+ sum(line_bonus)
     
-            print("{} => Score {} (Hole count: {}, Max altitude: {}, Roughness: {})".format(p, score, holes, max_alt, roughness))
+            print("{} => Score {} (Hole count: {}, Max altitude: {}, Line Bonus: {})".format(p, score, holes, max_alt, line_bonus))
             #print(self.board)
 
             # record the score, undo placement

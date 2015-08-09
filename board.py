@@ -173,75 +173,86 @@ class Board:
         column = 0
         row = 0
 
-        def _follow(p, path):
-            ne = p.move(NE)
-            if (ne not in path) and self.is_cell_valid(ne) and self.grid[ne.y][ne.x] == 1:
-                path.add(ne)
-                result = _follow(ne, path)
-                path.remove(ne)
-                if result != -1:
-                    heightmap[ne.x] = max(heightmap[ne.x], ne.y)
-                return result
+        def _follow(point, heightmap):
+            print("Begin trace at {}".format(point))
+            p = point
+            path = set()
+            finished = False
+            hm = copy.copy(heightmap)
+            _hash = lambda x: hash(repr(x))
+            _value = lambda p: (1 if p.y >= self.height else 0) or (self.is_cell_valid(p) and (self.grid[p.y][p.x] == 1))
+
+            while not finished:
+
+                ne = p.move(NE)
+                if (_hash((ne, NE)) not in path) and _value(ne):
+                    path.add(_hash((ne, NE)))
+                    hm[ne.x] = max(hm[ne.x], ne.y)
+                    p = ne
+                    #print("({}) {}".format(NE, ne))
+                    continue
+
+                # if we reach the other side, then we have a closed surface and can update the heightmap
+                if p.x == (self.width-1):
+                    finished = p.x
+                    continue
+
+                e = p.move(E)
+                if (_hash((e, E)) not in path) and _value(e):
+                    path.add(_hash((e, E)))
+                    hm[e.x] = max(hm[e.x], e.y)
+                    p = e
+                    #print("({}) {}".format(E, e))
+                    continue
+                        
+                se = p.move(SE)
+                if (_hash((se, SE)) not in path) and _value(se):
+                    path.add(_hash((se, SE)))
+                    hm[se.x] = max(hm[se.x], se.y)
+                    p = se
+                    #print("({}) {}".format(SE, se))
+                    continue
+
+                sw = p.move(SW)
+                if (_hash((sw, SW)) not in path) and _value(sw):
+                    path.add(_hash((sw, SW)))
+                    p = sw
+                    #print("({}) {}".format(SW, sw))
+                    continue
+
+                w = p.move(W)
+                if (_hash((w, W)) not in path) and _value(w):
+                    path.add(_hash((w, W)))
+                    p = w
+                    #print("({}) {}".format(W, w))
+                    continue
+
+                nw = p.move(NW)
+                if (_hash((nw, NW)) not in path) and _value(nw):
+                    path.add(_hash((nw, NW)))
+                    p = nw
+                    #print("({}) {}".format(NW, nw))
+                    continue
+
+                print("Trace bombed out!\n")
+                # we've hit a loop
+                return -1
+            for i in range(len(heightmap)):
+                heightmap[i] = hm[i]
+            print("Trace finished!\n")
+            return finished
             
-            # if we reach the other side, then we have a closed surface and can update the heightmap
-            if p.x == (self.width-1):
-                return p.x
 
-            e = p.move(E)
-            if (e not in path) and ((e.y == self.height) or (self.is_cell_valid(e) and self.grid[e.y][e.x])) == 1:
-                path.add(e)
-                result = _follow(e, path)
-                path.remove(e)
-                if result != -1:
-                    heightmap[e.x] = max(heightmap[e.x], e.y)
-                return result
-                    
-            se = p.move(SE)
-            if (se not in path) and self.is_cell_valid(se) and self.grid[se.y][se.x] == 1:
-                path.add(se)
-                result = _follow(se, path)
-                path.remove(se)
-                if result != -1:
-                    heightmap[se.x] = max(heightmap[se.x], se.y)
-                return result
-
-            sw = p.move(SW)
-            if (sw not in path) and ((sw.y == self.height) or (self.is_cell_valid(sw) and self.grid[sw.y][sw.x])) == 1:
-                path.add(sw)
-                result = _follow(sw, path)
-                path.remove(sw)
-                return result
-
-            w = p.move(W)
-            if (w not in path) and self.is_cell_valid(w) and self.grid[w.y][w.x] == 1:
-                path.add(w)
-                result = _follow(w, path)
-                path.remove(w)
-                return result
-
-            nw = p.move(NW)
-            if (nw not in path) and self.is_cell_valid(nw) and self.grid[nw.y][nw.x] == 1:
-                path.add(nw)
-                result = _follow(nw, path)
-                path.remove(nw)
-                return result
-
-
-            # we've hit a loop
-            return -1
-            
-
-        path_cache = set()
         while (column < self.width):
             for row in range(self.height):
                 if self.grid[row][column] == 1:
-                    result = _follow(Pt(column, row), path_cache)
+                    result = _follow(Pt(column, row), heightmap)
                     if result != -1:
                         heightmap[column] = row
                         column = result
                         break
                 elif row == self.height-1:
-                    result = _follow(Pt(column, row+1), path_cache)
+                    result = _follow(Pt(column, row+1), heightmap)
                     if result != -1:
                         heightmap[column] = row+1
                         column = result
@@ -277,6 +288,7 @@ class Board:
         hole = 0
         #hole |= (l and r) or (tl and br) or (bl and tr)
         hole |= (l and tr and br) or (r and tl and bl)
+        hole |= (l and r and bl and br)
         #if hole:
         #    print("{},{},{},{},{},{} = {}".format(l, tl, tr, r, br, bl, hole))
         #    print('{},{}'.format(x,y))
