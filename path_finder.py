@@ -54,9 +54,12 @@ class PathFinder:
         self.unit_ends = unit_ends
         self.words = get_axis_words(power)
         self.steps = []
+        self.lowest_y = 0
+        self.checking_lowest = False
+        self.lowest_unit = copy.deepcopy(self.unit_start)
 
     def complete(self):
-        return self.unit_start == self.unit_ends[0]
+        return self.unit_start == self.unit_ends[0] or (self.checking_lowest and self.board.current_unit.pivot.y == self.lowest_y)
 
     def finish_unit_basic(self):
         ba = BasicAlgorithm(self.board)
@@ -64,9 +67,14 @@ class PathFinder:
         while self.board.current_unit == unit:
             ba.step()
 
+    def check_lowest(self):
+        if self.checking_lowest is False and self.board.current_unit.pivot.y > self.lowest_y:
+            self.lowest_unit = copy.deepcopy(self.unit_ends[0])
+            self.lowest_y = self.lowest_unit.pivot.y
+
     def find_path(self):
         ms = [Move(E),Move(SE),Move(SW),Move(W)]
-        rotations = [ (i, Rotation(Clockwise)) for i in range(0,5)]
+        rotations = [] # [ (i, Rotation(Clockwise)) for i in range(0,5)]
         original_steps = len(self.board.steps)
 
         if len(self.unit_ends) == 0:
@@ -82,6 +90,7 @@ class PathFinder:
 
             while not self.complete():
                 been.append(self.board.current_unit.pivot)
+                self.check_lowest()
                 d = self.unit_ends[0].pivot.delta(self.unit_start.pivot)
                 axes = axis_sort(d)
 
@@ -100,16 +109,25 @@ class PathFinder:
                         tried = try_history.pop()
                     elif len(self.unit_ends)>1:
                         self.unit_ends.pop(0)
+                    elif self.checking_lowest is False:
+                        # res=""
+                        # for step in self.board.steps:
+                        #     res+=str(step.command())
+                        # print(res)
+                        # print(self.board)
+                        print("PathFinder: No commands left to try...trying lowest unit")
+                        #
+                        # self.finish_unit_basic()
+                        # break
+                        self.checking_lowest = True
+                        self.unit_ends.pop(0)
+                        self.unit_ends.append(copy.deepcopy(self.lowest_unit))
                     else:
-                        res=""
-                        for step in self.board.steps:
-                            res+=str(step.command())
-                        print(res)
-                        print(self.board)
-                        print("PathFinder: No commands left to try...")
-
+                        print("PathFinder: No commands left to try, even lowest unit")
                         self.finish_unit_basic()
                         break
+
+
                 # input("PathFinder: Press enter to continue")
 
 
@@ -121,10 +139,18 @@ class PathFinder:
                     self.board.undo_last_step()
                 else:
                     break
+            for rot in rotations:
+                self.board.step(rot[1])
+                if self.board.current_unit == self.unit_start:
+                    self.board.undo_last_step()
+                else:
+                    break
             if self.board.current_unit == self.unit_start:
+                print(self.lowest_unit)
+                print(self.board)
                 raise Exception("path_finder failed to lock unit")
 
-        cmds=[]
-        for i in range(original_steps, len(self.board.steps)):
-            cmds.append(self.board.steps[i].command())
-        return cmds
+        # cmds=[]
+        # for i in range(original_steps, len(self.board.steps)):
+        #     cmds.append(self.board.steps[i].command())
+        # return cmds

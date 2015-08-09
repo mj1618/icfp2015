@@ -56,8 +56,8 @@ def run_problems(start,end):
     elif args.a:
         hook = animate(args.a/10)
 
-    submit_data = []
     for p in range(start,end):
+        submit_data = []
         print("Problem %d"%p)
         probs = loader.get_qualifier_problems(p)
         test_prob = probs[0]
@@ -77,7 +77,7 @@ def run_problems(start,end):
                 "solution": KnownWords.encode(test_board.get_solution())
             })
 
-    loader.submit(submit_data)
+        loader.submit(submit_data)
 
 
 def run_all():

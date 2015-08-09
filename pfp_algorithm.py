@@ -10,6 +10,7 @@ from unit import *
 from placer_algorithm import *
 from path_finder import PathFinder
 from basic_algorithm import *
+import sys
 class PfpAlgorithm:
     def __init__(self,board,power,step_hook=None):
         self.board=board
@@ -33,8 +34,9 @@ class PfpAlgorithm:
             units = None
 
         pf = PathFinder(self.board, self.board.current_unit, units, self.power)
-        for cmd in pf.find_path():
-           if cmd is not None:
-               self.cmds.append(cmd)
+        pf.find_path()
+        # for cmd in pf.find_path():
+        #    if cmd is not None:
+        #        self.cmds.append(cmd)
 
         # input("PFP: Press enter to continue")
