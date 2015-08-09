@@ -157,9 +157,8 @@ class Power(Action):
         return True
 
     def _done(self, board):
-        if logger.active:
-            result = "DONE" if self.completed else "CANCELLED"
-            logger.msg(result + ": invoking phrase of power: " + str(self.word))
+        if logger.active and self.completed:
+            logger.msg("DONE: invoked phrase of power: " + str(self.word))
 
     def _undo(self,board):
         self.subundo(board)

@@ -9,14 +9,44 @@ from random import randint
 from unit import *
 from basic_algorithm import *
 
+def axis_sort(p):
+    dirs = [(p.e, E), (p.se, SE), (p.sw, SW), (-p.e, W)]
+    dirs.sort(key=lambda x: x[0], reverse=True)
+    return dirs
+
+axis_word_cache = {}
+# returns the power words from the given list, grouped by predominant direction
+def get_axis_words(power):
+    # cache result, since PathFinder is constructed many times
+    words = axis_word_cache.get(power)
+    if words is not None:
+        return words
+    words = {E: [], SE: [], SW: [], W: []}
+    for pw in power.words:
+        dir = axis_sort(pw.net_displacement)[0][1]
+        words[dir].append(pw)
+    axis_word_cache[power] = words
+    return words
+
+def next_cmd(axes, words, tried):
+    for axis in axes:
+        dir = axis[1]
+        for pw in words[dir]:
+            if pw not in tried:
+                return pw
+    for axis in axes:
+        dir = axis[1]
+        if Move(dir) not in tried:
+            return Move(dir)
+    return None
+
 class PathFinder:
     def __init__(self,board,unit_start,unit_end,power):
         self.board=board
         self.unit_start = unit_start
         self.unit_end = unit_end
-        self.power = power
+        self.words = get_axis_words(power)
         self.steps = []
-
 
     def complete(self):
         return self.unit_start == self.unit_end
@@ -44,34 +74,16 @@ class PathFinder:
 
             while not self.complete():
                 been.append(self.board.current_unit.pivot)
-                sources = self.board.sources_remaining
                 d = self.unit_end.pivot.delta(self.unit_start.pivot)
+                axes = axis_sort(d)
 
-                cmd = None
-                if d.e > 0 and Move(E) not in tried :
-                    cmd = Move(E)
-                elif d.se > 0 and Move(SE) not in tried:
-                    cmd = Move(SE)
-                elif d.sw > 0 and Move(SW) not in tried:
-                    cmd = Move(SW)
-                elif d.e < 0 and Move(W) not in tried:
-                    cmd = Move(W)
-
-                if cmd is None:
-                    for w in self.power.words:
-                        if w not in tried:
-                            cmd = w
-                            break
-                    for m in ms:
-                        if m not in tried:
-                            cmd = m
-                            break
+                cmd = next_cmd(axis_sort(d), self.words, tried)
 
                 if cmd is not None:
                     self.board.step(cmd)
+                    tried.append(cmd)
                     if self.board.error or self.board.current_unit != self.unit_start or self.board.current_unit.pivot in been:
                         self.board.undo_last_step()
-                        tried.append(cmd)
                     else:
                         try_history.append(tried)
                         tried = []

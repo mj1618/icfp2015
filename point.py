@@ -82,6 +82,8 @@ class HexPt:
         return "(%dE %dSE %dSW)" % (self.e, self.se, self.sw)
 
     def __eq__(self, other):
+        if not isinstance(other, HexPt):
+            return False
         return self.e == other.e and self.se == other.se and self.sw == other.sw
 
     def __hash__(self):
