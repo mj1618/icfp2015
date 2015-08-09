@@ -25,7 +25,7 @@ class PfpAlgorithm:
 
     def step(self):
         pa = PlacerAlgorithm(self.board)
-        pa.board.install_step_hook(None)
+        # pa.board.install_step_hook(None)
         try:
             unit = pa.step()
         except:

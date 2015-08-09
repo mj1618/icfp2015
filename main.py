@@ -104,10 +104,16 @@ def animate(delay=0.1):
 def main(args):
 
 
+    hook = None
+    if args.v:
+        hook = display
+    elif args.a:
+        hook = animate(args.a/10)
+
     probs = loader.get_qualifier_problems(args.p)
     
     test_prob = probs[0]
-    test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0],sources_length=test_prob["sourceLength"])
+    test_board = Board(test_prob["width"], test_prob["height"], test_prob["grid"], test_prob["units"], seed=test_prob["sourceSeeds"][0],sources_length=test_prob["sourceLength"],step_hook=hook)
     print("loaded")
 
     # while not test_board.is_complete():
@@ -117,16 +123,11 @@ def main(args):
     # test_board.step(Rotation(Clockwise))
     # pdb.set_trace()
 
-    hook = None
-    if args.v:
-        hook = display
-    elif args.a:
-        hook = animate(args.a/10)
 
 
     submit_data = []
 
-    algo = PfpAlgorithm(test_board, step_hook=None)
+    algo = PfpAlgorithm(test_board, step_hook=hook)
     algo.start()
 
 
@@ -146,7 +147,7 @@ def main(args):
     for step in test_board.steps:
         for action in step.actions:
             pprint(vars(action))
-    if args.s:
+    if args.s > 0:
         loader.submit(submit_data)
     #
     # for step in test_board.steps:
@@ -162,7 +163,7 @@ actgroup = opts.add_mutually_exclusive_group()
 actgroup.add_argument("-r", help="run replay test", action="store_true")
 actgroup.add_argument("-pf", help="run path finder test", action="store_true")
 opts.add_argument("-p", type=int, help="select a qualifying problem", default=1)
-opts.add_argument("-runp", type=int, help="select a qualifying problem and submit solution", default=1)
+opts.add_argument("-runp", type=int, help="select a qualifying problem and submit solution")
 opts.add_argument("-all", help="run through and submit all problems", action="store_true")
 opts.add_argument("-s", help="submit solution to the specified problem", action="count")
 
