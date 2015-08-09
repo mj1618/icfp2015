@@ -34,16 +34,16 @@ def next_cmd(axes, words, rots, tried):
         for pw in words[dir]:
             if pw not in tried:
                 tried.add(pw)
-                return pw
+                return Power(pw, True)
     for axis in axes:
         dir = axis[1]
         if Move(dir) not in tried:
             tried.add(Move(dir))
-            return Move(dir)
+            return CommandAction(Move(dir))
     for rot in rots:
         if rot not in tried:
             tried.add(rot)
-            return rot[1]
+            return CommandAction(rot[1])
 
     return None
 
@@ -134,7 +134,7 @@ class PathFinder:
         if self.board.current_unit == self.unit_start:
             # lock the piece by crashing into a neighbouring cell
             for cmd in ms:
-                self.board.step(cmd)
+                self.board.step(CommandAction(cmd))
                 if self.board.current_unit == self.unit_start:
                     self.board.undo_last_step()
                 else:
@@ -152,5 +152,5 @@ class PathFinder:
 
         # cmds=[]
         # for i in range(original_steps, len(self.board.steps)):
-        #     cmds.append(self.board.steps[i].command())
+        #     cmds.append(self.board.steps[i])
         # return cmds

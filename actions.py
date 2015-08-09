@@ -10,38 +10,12 @@ RNG_INC = 12345
 RNG_MASK = 0x7fff0000
 RNG_TRUNC = 16
 
-class Step:
-    def __init__(self,actions):
-        self.actions=actions
-    def undo(self,board):
-        for a in self.actions:
-            a.undo(board)
-    def __str__(self):
-        return "Step" + str([str(a) for a in self.actions])
-    def command(self):
-        cmds = []
-        for action in self.actions:
-            if type(action) is CommandAction:
-                return action.cmd
-        return cmds
-    def commands(self):
-        cmds = []
-        for action in self.actions:
-            if type(action) is CommandAction:
-                cmds.append(action.cmd)
-            elif type(action) is Power:
-                for sa in action.subactions:
-                    if type(sa) is CommandAction:
-                        cmds.append(sa.cmd)
-        return cmds
-
-
-
 class Action:
     # helper method for performing subactions
     def subaction(self,action,board):
-        action.do(board)
+        result = action.do(board)
         self.subactions.append(action)
+        return result
 
     # subclass needs to manually invoke
     def subundo(self,board):
@@ -226,7 +200,7 @@ class NewUnitAction(Action):
             board.current_unit = None
             return
 
-        r = board.rng_action()
+        r = self.subaction(RngAction(board), board)
         self.index = r
         new_unit = copy.deepcopy(board.units[r])
         board.sources_remaining-=1

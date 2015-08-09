@@ -30,7 +30,7 @@ class ReplayAlgorithm:
             if cmd is None:
                 print("Hit invalid character {}, aborting".format(c))
                 break
-            self.board.step(cmd)
+            self.board.step(CommandAction(cmd))
             if self.animator is not None:
                 self.animator.next_frame()
 
