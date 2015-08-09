@@ -17,7 +17,7 @@ class Step:
         for a in self.actions:
             a.undo(board)
     def __str__(self):
-        return [ str(a) for a in self.actions]
+        return "Step" + str([str(a) for a in self.actions])
     def command(self):
         for action in self.actions:
             if type(action) is CommandAction:
@@ -170,11 +170,12 @@ class NewUnitAction(Action):
 
 
     def undo(self,board):
-        board.current_unit=self.unit
-        if board.current_unit is not None:
-            for pt in board.current_unit.get_pts():
+        if self.unit is not None:
+            for pt in self.unit.get_pts():
                 board.grid[pt.y][pt.x] = 0
         for subaction in self.subactions.reverse():
             subaction.undo(board)
         board.is_full = False
-        board.sources_remaining+=1
+        if board.current_unit is not None:
+            board.sources_remaining+=1
+        board.current_unit=self.unit
