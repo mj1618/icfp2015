@@ -12,14 +12,13 @@ UNIT_UNIT_PIVOT = u"Ü"
 class Command:
     # the keys specify the set of possible commands. instances are initialised lazily
     instances = {W: None, E: None, SW: None, SE: None, Clockwise: None, Counterwise: None}
-
+    def __deepcopy__(self,dict):
+        return self
 class Move(Command):
     def __new__(cls, dir):
         if Command.instances[dir] is None:
             Command.instances[dir] = super(Move, cls).__new__(cls)
         return Command.instances[dir]
-    def __deepcopy__(self,memo):
-        return self
     def __init__(self, dir):
         self.dir = dir
     def __repr__(self):
@@ -33,8 +32,6 @@ class Rotation(Command):
         return Command.instances[rot]
     def __init__(self, rot):
         self.rot = rot
-    def __deepcopy__(self,memo):
-        return self
     def __repr__(self):
         return "Rotation(%swise)" % ("Clock" if self.rot is Clockwise else "Counter")
 
