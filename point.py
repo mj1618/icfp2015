@@ -1,3 +1,5 @@
+import sys
+
 class Pt:
     """ An absolute point on the game board. """
     def __init__(self, x, y=None):
@@ -146,7 +148,7 @@ if __name__ == "__main__":
             assert start.move(dir) == end
             assert end.delta(start) == dir
         except AssertionError:
-            print(start, dir, end, start.move(dir), end.delta(start))
+            print(start, dir, end, start.move(dir), end.delta(start), file=sys.stderr)
             raise
     check(Pt(1,1), W, Pt(0,1))
     check(Pt(1,1), E, Pt(2,1))

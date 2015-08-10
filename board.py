@@ -137,7 +137,7 @@ class Board:
         row = 0
 
         def _follow(point, heightmap):
-            print("Begin trace at {}".format(point))
+            #print("Begin trace at {}".format(point))
             p = point
             path = set()
             finished = False
@@ -197,12 +197,12 @@ class Board:
                     #print("({}) {}".format(NW, nw))
                     continue
 
-                print("Trace bombed out!\n")
+                #print("Trace bombed out!\n")
                 # we've hit a loop
                 return -1
             for i in range(len(heightmap)):
                 heightmap[i] = hm[i]
-            print("Trace finished!\n")
+            #print("Trace finished!\n")
             return finished
             
 

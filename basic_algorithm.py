@@ -61,7 +61,7 @@ class BasicAlgorithm:
             step = self.board.step(CommandAction(cmd))
             # print("sources after: %d"%self.board.sources_remaining)
             if self.board.is_complete():
-                print("completing")
+                #print("completing")
                 return
             elif self.board.error:
                 self.board.undo_last_step()

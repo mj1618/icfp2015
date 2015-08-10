@@ -5,6 +5,7 @@ import urllib.request
 import urllib.parse
 import ssl
 import os.path
+import sys
 from point import Pt
 from unit import Unit
 import base64
@@ -15,11 +16,11 @@ LOCAL_PATH = "qualifiers/{}.json"
 def get_problem_data(i):
     local = LOCAL_PATH.format(i)
     if os.path.exists(local):
-        print("Loading qualifier {} from local cache...".format(i))
+        print("Loading qualifier {} from local cache...".format(i), file=sys.stderr)
         with open(local) as f:
             return f.read()
     url = QUALIFIER_PROBLEM_URL.format(i)
-    print("Loading {}...".format(url))
+    print("Loading {}...".format(url), file=sys.stderr)
     return urllib.request.urlopen(url).read().decode("utf8")
 
 def get_qualifier_problems(*args):
@@ -37,11 +38,11 @@ def submit(data):
     #context.load_verify_locations('C:\\Users\\Matt\\cacert.pem')
     h = http.client.HTTPSConnection('davar.icfpcontest.org',443,context=ssl.create_default_context())
     # url_params = urllib.parse.urlencode(json.dumps(data))
-    print("Submitting: "+json.dumps(data))
+    print("Submitting: "+json.dumps(data), file=sys.stderr)
     headers = { 'Content-Type' : 'application/json', "Authorization" : 'Basic '+base64.b64encode(b":lI/jYDtQwdrf4s+SDq6WW91LW5bXpH04ZWhIUI+clxo=").decode("ascii") }
     h.request('POST', '/teams/77/solutions', json.dumps(data), headers)
     r1 = h.getresponse()
-    print(r1.status, r1.reason)
+    print(r1.status, r1.reason, file=sys.stderr)
 
 def loader(input_data):
     data_filthy = json.loads(input_data)

@@ -8,6 +8,7 @@ from actions import *
 from random import randint
 from unit import *
 from basic_algorithm import *
+import sys
 
 def axis_sort(p):
     dirs = [(p.e, E), (p.se, SE), (p.sw, SW), (-p.e, W)]
@@ -118,7 +119,7 @@ class PathFinder:
                         #     res+=str(step.command())
                         # print(res)
                         # print(self.board)
-                        print("PathFinder: No commands left to try...trying lowest unit")
+                        print("PathFinder: No commands left to try...trying lowest unit", sys.stderr)
                         #
                         # self.finish_unit_basic()
                         # break
@@ -129,7 +130,7 @@ class PathFinder:
                         been = set()
                         tried = set()
                     else:
-                        print("PathFinder: No commands left to try, even lowest unit")
+                        print("PathFinder: No commands left to try, even lowest unit", sys.stderr)
                         self.finish_unit_basic()
                         break
 
@@ -148,8 +149,8 @@ class PathFinder:
             if self.board.current_unit == self.unit_start:
                 self.finish_unit_basic()
             if self.board.current_unit == self.unit_start:
-                print(self.lowest_unit)
-                print(self.board)
+                print(self.lowest_unit, file=sys.stderr)
+                print(self.board, file=sys.stderr)
                 raise Exception("path_finder failed to lock unit")
 
         # cmds=[]
