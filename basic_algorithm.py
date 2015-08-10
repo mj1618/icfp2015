@@ -33,11 +33,10 @@ class BasicAlgorithm:
         # elif r==3:
         #     cmd=Move(W)
 
-        phrases = self.phrases
         success = False
         self.i += 1
         if self.i%3 ==0:
-            for w in pws.words:
+            for w in self.phrases.words:
                 step = self.board.step(Power(w))
                 if self.board.is_complete():
                     return
