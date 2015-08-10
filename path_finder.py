@@ -29,12 +29,10 @@ def get_axis_words(power):
     return words
 
 def next_cmd(axes, words, rots, tried):
-    for axis in axes:
-        dir = axis[1]
-        for pw in words[dir]:
-            if pw not in tried:
-                tried.add(pw)
-                return Power(pw, True)
+    for pw in words[axes[0][1]]:
+        if pw not in tried:
+            tried.add(pw)
+            return Power(pw, True)
     for axis in axes:
         dir = axis[1]
         if Move(dir) not in tried:
