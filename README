@@ -1,0 +1,32 @@
+ICFP2015                    perthparkour.com                     ICFP2015
+=========================================================================
+
+Our digital davar generator has but one dependency: python3
+
+The design is centered around a stochastic[1] placement engine and
+directed depth-first search, injected with a generous helping of phrases
+of power[2].
+
+The path finding makes heavy use of backtracking and features
+intelligent[3] fallback in the event that the dark ones have entirely
+blocked off a section of the honeycomb.
+
+[1] translation: the target position for a particular unit is
+    non-deterministic for implementation reasons
+
+[2] at least it would be if we had managed to find any more!
+
+[3] translation: after exhausting all possible moves, we fall back to
+    flailing randomly
+
+
+
+Hey, at least we got the simulation working :)
+
+Stuff we ran out of time for:
+
+* Including different orientations in the placement engine
+* Subsituting power phrases in the final command string
+* Optimising path finding for the case where the placement engine keeps
+  choosing unreachable locations
+* Having the placement engine always choose a reachable location
