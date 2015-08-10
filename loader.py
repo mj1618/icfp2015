@@ -46,7 +46,9 @@ def submit(data):
 
 def loader(input_data):
     data_filthy = json.loads(input_data)
+    return cleanse(data_filthy)
 
+def cleanse(data_filthy):
     data = {}
     data["id"] = data_filthy.get("id", -1)
     data["width"] = data_filthy.get("width", 0)

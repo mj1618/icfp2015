@@ -12,13 +12,11 @@ from path_finder import PathFinder
 from basic_algorithm import *
 import sys
 class PfpAlgorithm:
-    def __init__(self,board,power,step_hook=None):
+    def __init__(self,board,power):
         self.board=board
         self.power = power
         self.last_pos = [0,0]
         self.i = 0
-        if step_hook is not None:
-            board.install_step_hook(step_hook)
         self.cmds = []
 
     def start(self):

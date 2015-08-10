@@ -51,6 +51,7 @@ class PathFinder:
         self.board=board
         self.unit_start = unit_start
         self.unit_ends = unit_ends
+        self.phrases = power
         self.words = get_axis_words(power)
         self.steps = []
         self.lowest_y = 0
@@ -61,7 +62,7 @@ class PathFinder:
         return self.unit_start == self.unit_ends[0] or (self.checking_lowest and self.board.current_unit.pivot.y == self.lowest_y)
 
     def finish_unit_basic(self):
-        ba = BasicAlgorithm(self.board)
+        ba = BasicAlgorithm(self.board, self.phrases)
         unit = self.board.current_unit
         while self.board.current_unit == unit:
             ba.step()

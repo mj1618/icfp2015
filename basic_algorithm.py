@@ -8,12 +8,11 @@ from actions import *
 from random import randint
 from unit import *
 class BasicAlgorithm:
-    def __init__(self,board,step_hook=None):
+    def __init__(self,board,phrases=KnownWords):
         self.board=board
         self.last_pos = [0,0]
         self.i = 0
-        if step_hook is not None:
-            board.install_step_hook(step_hook)
+        self.phrases = phrases
         random.seed(board.seed)
 
 
@@ -34,7 +33,7 @@ class BasicAlgorithm:
         # elif r==3:
         #     cmd=Move(W)
 
-        pws = KnownWords
+        phrases = self.phrases
         success = False
         self.i += 1
         if self.i%3 ==0:
