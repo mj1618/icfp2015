@@ -47,7 +47,11 @@ class PowerWords:
         if isinstance(action, Command):
             return chars[action][0]
         elif isinstance(action, Power):
-            return str(action.word)
+            if action.completed:
+                return str(action.word)
+            # the basic alg sometimes finishes the game halfway through a power word
+            # in this case we'd cause an error by encoding the entire word
+            return str(action.word)[:len(action.subactions)]
         raise TypeError(type(action))
 
     def encode(self, actions):

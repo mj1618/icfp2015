@@ -134,7 +134,7 @@ class Power(Action):
             unit = board.current_unit
         for cmd in self.word.cmds:
             self.subaction(CommandAction(cmd), board)
-            if board.error or board.current_unit == None:
+            if board.error or board.is_full or board.current_unit == None:
                 return False
             if self.single_unit and board.current_unit != unit:
                 return False
