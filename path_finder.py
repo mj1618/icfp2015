@@ -119,7 +119,7 @@ class PathFinder:
                         #     res+=str(step.command())
                         # print(res)
                         # print(self.board)
-                        print("PathFinder: No commands left to try...trying lowest unit", sys.stderr)
+                        print("PathFinder: No commands left to try...trying lowest unit", file=sys.stderr)
                         #
                         # self.finish_unit_basic()
                         # break
@@ -130,7 +130,7 @@ class PathFinder:
                         been = set()
                         tried = set()
                     else:
-                        print("PathFinder: No commands left to try, even lowest unit", sys.stderr)
+                        print("PathFinder: No commands left to try, even lowest unit", file=sys.stderr)
                         self.finish_unit_basic()
                         break
 
