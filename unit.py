@@ -96,11 +96,12 @@ class Unit:
         return False
 
     def rotation_matches(self,rotation):
-        unit = copy.deepcopy(self)
-        while unit.current_rotation != rotation:
-            unit.rotate(Clockwise)
+        if self.current_rotation == rotation:
+            return True
+        n = shortest_rotation(self.current_rotation, rotation)
+        mask2 = [pt.rotaten(n) for pt in self.mask]
         for m in self.mask:
-            if m not in unit.mask:
+            if m not in mask2:
                 return False
         return True
 

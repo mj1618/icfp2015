@@ -109,6 +109,16 @@ class HexPt:
         """Rotates this point counter-clockwise around 0E 0SE 0SW"""
         return HexPt(self.se, self.sw, -self.e)
 
+    def rotaten(self, n):
+        e, se, sw = self.e, self.se, self.sw
+        if n > 0:
+            for _ in range(n):   #clockwise
+                e, se, sw = -sw, e, se
+        else:
+            for _ in range(-n):
+                e, se, sw = se, sw, -e
+        return HexPt(e, se, sw)
+
 NW = HexPt(0, -1, 0, "NW")
 NE = HexPt(0, 0, -1, "NE")
 E = HexPt(1, 0, 0, "E")
@@ -118,6 +128,17 @@ W = HexPt(-1, 0, 0, "W")
 
 Clockwise = HexPt.clockwise
 Counterwise = HexPt.counterwise
+
+orientations = [NE, E, SE, SW, W, NW]
+
+# returns +ve for clockwise, -ve for counterwise
+def shortest_rotation(start, end):
+    d = orientations.index(end) - orientations.index(start)
+    if d < -3:
+        return d + 6
+    elif d > 3:
+        return d - 6
+    return d
 
 if __name__ == "__main__":
     def check(start, dir, end):
@@ -146,3 +167,10 @@ if __name__ == "__main__":
     check(Pt(2,3), HexPt(0,-1,-2), Pt(3,0))
     check(Pt(2,4), HexPt(1,1,0), Pt(3,5))
     check(Pt(4,1), NE, Pt(5,0))
+    assert shortest_rotation(NE, E) == 1
+    assert shortest_rotation(NE, NW) == -1
+    assert shortest_rotation(E, NW) == -2
+    assert NE.rotaten(3) == SW
+    assert NE.rotaten(6) == NE
+    assert NE.rotaten(4) == W
+    assert NW.rotaten(-2) == SW

@@ -98,7 +98,7 @@ class Animator:
                 now = time.time()
         self.last_frame = now
         # clear screen
-        print("\033[H\033[J")
+        #print("\033[H\033[J")
         #os.system('cls' if os.name == 'nt' else 'clear')
 
 # returns a step_hook suitabe function
