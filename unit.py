@@ -83,9 +83,9 @@ class Unit:
         if type(last_command) is Move:
             self.pivot = self.pivot.move(-last_command.dir)
         elif last_command.rot is Clockwise:
-            self.mask = [Counterwise(pt) for pt in self.mask]
+            self.rotate(Counterwise)
         else:
-            self.mask = [Clockwise(pt) for pt in self.mask]
+            self.rotate(Clockwise)
         self.old_states.pop()
 
     def is_error(self):
